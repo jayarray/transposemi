@@ -1,17 +1,28 @@
+// BUTTONS
+
+var transpose_button = document.getElementById("transpose_button");
+transpose_button.addEventListener('click', transpose);
+
+//---------------------------------------
+// TEXTAREAS
+
 var original_textarea = document.getElementById("original_textarea");
 var transposed_textarea = document.getElementById("transposed_textarea");
+
+function transpose()
+{
+  transposed_textarea.value = '[TRANSPOSED]\n\n' + original_textarea.value;
+}
+
+//---------------------------------------
+// DROPDOWNS
 
 var start_dropdown = document.getElementById("start_dropdown");
 setStartDropdownOptions();
 
 var end_dropdown = document.getElementById("end_dropdown");
-setEndDropdownOptions();
+setEndDropdownOptions(chord_names);
 
-var transpose_button = document.getElementById("transpose_button");
-transpose_button.addEventListener('click', 'transpose');
-
-//---------------------------------------
-// DROPDOWNS
 
 function setStartDropdownOptions()
 {
@@ -26,12 +37,13 @@ function setStartDropdownOptions()
   }
 }
 
-function setEndDropdownOptions()
+function setEndDropdownOptions(arr)
 {
-  let c = chord_names;
-  for (i = 0; i < c.length; ++i)
+  end_dropdown.length = 0;
+
+  for (i = 0; i < arr.length; ++i)
   {
-    let curr_chord = chord_names[i];
+    let curr_chord = arr[i];
     let option = document.createElement('option');
     option.value = curr_chord;
     option.text = curr_chord;
@@ -40,24 +52,4 @@ function setEndDropdownOptions()
 }
 
 
-//---------------------------------------
-//
 
-
-function getChordInfo(str)
-{
-  // TO DO
-}
-
-
-
-function transpose()
-{
-  // Get original text
-
-  // Transpose it
-
-  // Return formatted html (with colored fonts n stuff)
-
-  // Display in tranposed_textarea
-}
