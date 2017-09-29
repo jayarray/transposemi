@@ -1,0 +1,23 @@
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+.v_lo {
+  display: flex;
+  flex_direction: column;
+}
+
+.h_lo {
+  display: flex;
+  flex_direction: row;
+}
+
+#main > div {
+  flex: 1;
+}
+
+#title {
+  font-size: 28pt;
+  font-weight: bold;
+}

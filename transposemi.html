@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+  <div class="v_lo" id="main">
+    <div class="h_lo" id="top_lo">
+      <div id="logo_div">
+        <img id="logo" src="logo.png" width="100" height="100">
+      </div>
+      <div id="title">Transpose Mi</div>
+      <div class="h_lo" id="start_dropdown_div">
+        <select id="start_dropdown"></select>
+        <select id="end_dropdown"></select>
+        <button class="" id="transpose_button" type="button">Transpose</button>
+      </div>
+    </div>
+    <div class="h_lo" id="bottom_lo">
+      <div class="v_lo" id="left">
+        <div class="header" id="original_text_header">Original Text</div>
+        <div id="original_text_div">
+          <textarea id="original_textarea" rows="50" cols="50"></textarea>
+        </div>
+      </div>
+      <div class="v_lo" id="right">
+        <div class="header" id="original_text_header">Transposed</div>
+        <div id="transposed_text_div">
+          <textarea id="transposed_textarea" rows="50" cols="50" readonly></textarea>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="chromatic_scale.js"></script>
+    <script type="text/javascript" src="transposemi.js"></script>
+  </div>
+</html>
