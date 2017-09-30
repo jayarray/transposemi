@@ -228,11 +228,11 @@ function getRawTokens(str)
   }
 
   // CHeck if there are chars/text leftover
-  console.log('LEFTOVER_CURR_TEXT = ' + curr_text); // DEBUG
+  console.log('LEFTOVER_STRING = ' + str.substring(start_index)); // DEBUG
   let is_word = false;
-  for (k = 0; k < curr_text.length; ++k)
+  for (k = start_index; k < str.length; ++k)
   {
-    if (!isWordChar(curr_text.charAt(k)))
+    if (!isWordChar(str.charAt(k)))
     {
       is_word = false;
       break;
@@ -243,13 +243,13 @@ function getRawTokens(str)
   {
     let word = new RawToken();
     word.is_word = true;
-    word.string = curr_text;
+    word.string = str.substring(start_index);
     raw_tokens.push(word);
   }
   else
   {
     let plaintext = new RawToken();
-    plaintext.string = curr_text;
+    plaintext.string = str.substring(start_index);
     raw_tokens.push(plaintext);
   }
   return raw_tokens.slice(1);  // 1st item and on.
