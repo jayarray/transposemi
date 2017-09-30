@@ -3,6 +3,7 @@
 var transpose_button = document.getElementById("transpose_button");
 transpose_button.addEventListener('click', transpose);
 
+
 //---------------------------------------
 // TEXTAREAS
 
@@ -11,8 +12,18 @@ var transposed_textarea = document.getElementById("transposed_textarea");
 
 function transpose()
 {
-  transposed_textarea.value = '[TRANSPOSED]\n\n' + original_textarea.value;
+  let original_text = original_textarea.value; 
+  original_textarea.value += '\n\nCHAR_COUNT = ' + original_text.length;
+
+  let raw_tokens = getRawTokens(original_text);
+  original_textarea.value += '\n\nTOKEN_COUNT = ' + raw_tokens.length;
+
+  for (i = 0; i < raw_tokens.length; ++i)
+  {
+    original_textarea.value += '\n' + raw_tokens[i].descr();
+  }
 }
+
 
 //---------------------------------------
 // DROPDOWNS
@@ -50,6 +61,8 @@ function setEndDropdownOptions(arr)
     end_dropdown.appendChild(option);
   }
 }
+
+
 
 
 
