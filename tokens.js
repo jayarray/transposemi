@@ -228,17 +228,21 @@ function getRawTokens(str)
   }
 
   // CHeck if there are chars/text leftover
-  console.log('LEFTOVER_STRING = ' + str.substring(start_index)); // DEBUG
-  let is_word = false;
-  for (k = start_index; k < str.length; ++k)
+  let leftover_str = str.substring(start_index);
+  console.log('LEFTOVER_STRING = ' + leftover_str); // DEBUG
+
+  let is_word = true;
+  for (k = 0; k < leftover_str.length; ++k)
   {
-    if (!isWordChar(str.charAt(k)))
+    let c = leftover_str.charAt(k);
+    if (!isWordChar(c) && !isSpecialSymbol(c))
     {
       is_word = false;
       break;
     }
   }
 
+  console.log('IS_WORD = ' + is_word);
   if (is_word)
   {
     let word = new RawToken();
