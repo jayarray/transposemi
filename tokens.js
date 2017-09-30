@@ -226,7 +226,7 @@ function getRawTokens(str)
       curr_text += curr_char;
     }
   }
-  return raw_tokens;
+  return raw_tokens.slice(1);  // 1st item and on.
 }
 
 function getProcessedTokens(raw_tokens)
