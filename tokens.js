@@ -196,7 +196,7 @@ function getRawTokens(str)
           raw_tokens.push(comment);
     
           prev_char = str.charAt(end_index - 1);
-          i = end_index;
+          i = end_index + 1;
           start_index = i;
         }
       } 
@@ -213,18 +213,44 @@ function getRawTokens(str)
     }
     else if (!isWordChar(prev_char) && isWordChar(curr_char))
     {
-        let plaintext = new RawToken();
-        plaintext.string = str.substring(start_index, i);
-        raw_tokens.push(plaintext);
+      let plaintext = new RawToken();
+      plaintext.string = str.substring(start_index, i);
+      raw_tokens.push(plaintext);
   
-        prev_char = curr_char;
-        start_index = i;
+      prev_char = curr_char;
+      start_index = i;
     }
     else
     {
       prev_char = curr_char;
       curr_text += curr_char;
     }
+  }
+
+  // CHeck if there are chars/text leftover
+  console.log('LEFTOVER_CURR_TEXT = ' + curr_text); // DEBUG
+  let is_word = false;
+  for (k = 0; k < curr_text.length; ++k)
+  {
+    if (!isWordChar(curr_text.charAt(k)))
+    {
+      is_word = false;
+      break;
+    }
+  }
+
+  if (is_word)
+  {
+    let word = new RawToken();
+    word.is_word = true;
+    word.string = curr_text;
+    raw_tokens.push(word);
+  }
+  else
+  {
+    let plaintext = new RawToken();
+    plaintext.string = curr_text;
+    raw_tokens.push(plaintext);
   }
   return raw_tokens.slice(1);  // 1st item and on.
 }
