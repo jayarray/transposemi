@@ -17,30 +17,31 @@ function transpose()
 
   // Get lines
   let lines = original_text.split('\n');
+  console.log('\nTOTAL_LINES = ' + lines.length); // DEBUG
 
   // Get TextLines
   let text_lines = [];
   for (i = 0; i < lines.length; ++i)
   {
     let curr_line = lines[i];
-    console.log('\nCURR_LINE (' + i + ')'); // DEBUG
+    console.log('\nCURR_LINE (' + i + '): ' + curr_line); // DEBUG
     if (curr_line.trim() != '')
     {
       let raw_tokens = getRawTokens(curr_line);
       // DEBUG
-      console.log('RAW_TOKEN_COUNT = ' + raw_tokens.length);
+      console.log('\nRAW_TOKEN_COUNT = ' + raw_tokens.length);
       for (i = 0; i < raw_tokens.length; ++i)
       {
-        console.log('RAW_TOKEN: ' + raw_tokens[i].descr());
+        console.log('  RAW_TOKEN: ' + raw_tokens[i].descr());
       }
       // DEBUG
 
       let processed_tokens = getProcessedTokens(raw_tokens);
       // DEBUG
-      console.log('\n\nPROCESSED_TOKEN_COUNT = ' + processed_tokens.length);
+      console.log('\nPROCESSED_TOKEN_COUNT = ' + processed_tokens.length);
       for (i = 0; i < processed_tokens.length; ++i)
       {
-        console.log('PROCESSED_TOKEN: ' + processed_tokens[i].descr());
+        console.log('  PROCESSED_TOKEN: ' + processed_tokens[i].descr());
       }
       // DEBUG
       
@@ -57,10 +58,10 @@ function transpose()
     }
   }
 
-  console.log('\n\nTEXT_LINE_COUNT = ' + text_lines.length);
+  console.log('\nTEXT_LINE_COUNT = ' + text_lines.length);
   for (i = 0; i < text_lines.length; ++i)
   {
-    console.log('TEXTLINE (' + i + '): ' + text_lines[i].descr());
+    console.log('  TEXTLINE (' + i + '): ' + text_lines[i].descr());
   }
 
   return; // DEBUG
@@ -85,17 +86,19 @@ function transpose()
 
 var start_dropdown = document.getElementById("start_dropdown");
 setStartDropdownOptions();
+start_dropdown.addEventListener('change', changeEndDropdownOptions)
 
 var end_dropdown = document.getElementById("end_dropdown");
 setEndDropdownOptions(chord_names);
+changeEndDropdownOptions();
 
 
 function setStartDropdownOptions()
 {
-  let c = chord_names;
-  for (i = 0; i < c.length; ++i)
+  let all_chord_names = getFullListOfChords();
+  for (i = 0; i < all_chord_names.length; ++i)
   {
-    let curr_chord = chord_names[i];
+    let curr_chord = all_chord_names[i];
     let option = document.createElement('option');
     option.value = curr_chord;
     option.text = curr_chord;
@@ -117,7 +120,15 @@ function setEndDropdownOptions(arr)
   }
 }
 
-
+function changeEndDropdownOptions()
+{
+  let start_chord = start_dropdown.options[start_dropdown.selectedIndex].value;
+  if (start_chord.endsWith('m'))
+  {
+    let available_options = getMinorChords();
+    setEndDropdownOptions(available_options);
+  }
+}
 
 
 

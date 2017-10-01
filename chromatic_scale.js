@@ -47,4 +47,24 @@ function minorKeyScaleLookup(key)
 
 //---------------------------------
 
+function getMajorChords()
+{
+  return chord_names;
+}
 
+function getMinorChords()
+{
+  let minor_chords = [];
+  for (i = 0; i < chord_names.length; ++i)
+  {
+    let chord_str = chord_names[i] + 'm';
+    minor_chords.push(chord_str);
+  }
+  return minor_chords;
+}
+
+function getFullListOfChords()
+{
+  let minor_chords = getMinorChords();
+  return chord_names.concat(minor_chords);
+}
