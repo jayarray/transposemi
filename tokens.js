@@ -18,6 +18,7 @@ class ProcessedToken
   constructor() 
   {
     this.type = null; // CHORD | COMMENT | PLAINTEXT
+    this.needs_transposing = null;
     this.string = null;
   }
 
@@ -31,7 +32,7 @@ class TextLine
 {
   constructor()
   {
-    this.args = [];
+    this.processed_tokens = [];
     this.format_str = '';
   }
 
@@ -46,7 +47,7 @@ class TextLine
 
   addArg(token_arg)
   {
-    this.args.push(token_arg);
+    this.processed_tokens.push(token_arg);
   }
 
   appendToFormatString(str)
@@ -56,7 +57,7 @@ class TextLine
 
   hasComments()
   {
-    for (i = 0; i < this.args.length; ++i)
+    for (i = 0; i < this.processed_tokens.length; ++i)
     {
       let curr_token = this.args[i];
       if (curr_token.is_comment)
@@ -69,22 +70,27 @@ class TextLine
 
   toString()
   {
-    if (args.length == 0)
+    if (processed_tokens.length == 0)
     {
       return this.format_str;
     }
 
-    for (i = 0; i < this.args.length; ++i)
+    for (i = 0; i < this.processed_tokens.length; ++i)
     {
       let curr_token = argsArr[i];
       //Object[] args = curr_token.Args();
-      argStrings[i] = String.format(curr_token.format_str, args);
+      argStrings[i] = String.format(curr_token.format_str, processed_tokens);
     }
 
     //Object[] argObjArr = argStrings;
     //String finalString = String.format(FormatStringBuilder.toString(), argObjArr);
 
     return finalString;
+  }
+
+  descr()
+  {
+    return 'PROCESSED_TOKENS = ' + this.processed_tokens.length + ', FORMAT_STR = ' + this.format_str;
   }
 }
 
@@ -126,6 +132,25 @@ function isClosedPair(open_bracket, closed_bracket)
 function getLines(str)
 {
   return str.split('\n');
+}
+
+function commentNeedsTransposing(str)
+{
+  let content = str.slice(1, str.length - 1); // str[1:last)
+  let raw_tokens = getRawTokens(content);
+  let processed_tokens = getProcessedTokens(raw_tokens);
+
+  let needs_transposing = true;
+  for (i = 0; i < processed_tokens.length; ++i)
+  {
+    let curr_proc_token = processed_tokens[i];
+    if (curr_proc_token.type == 'comment' || curr_proc_token.type == 'plaintext')
+    {
+      needs_transposing = false;
+      break;
+    }
+  }
+  return needs_transposing;
 }
 
 function getRawTokens(str)
@@ -227,9 +252,9 @@ function getRawTokens(str)
     }
   }
 
-  // CHeck if there are chars/text leftover
+  // Check if there are chars/text leftover
   let leftover_str = str.substring(start_index);
-  console.log('LEFTOVER_STRING = ' + leftover_str); // DEBUG
+  //console.log('LEFTOVER_STRING = ' + leftover_str); // DEBUG
 
   let is_word = true;
   for (k = 0; k < leftover_str.length; ++k)
@@ -242,7 +267,7 @@ function getRawTokens(str)
     }
   }
 
-  console.log('IS_WORD = ' + is_word);
+  //console.log('IS_WORD = ' + is_word);
   if (is_word)
   {
     let word = new RawToken();
@@ -259,29 +284,48 @@ function getRawTokens(str)
   return raw_tokens.slice(1);  // 1st item and on.
 }
 
+
+function getProcessedToken(raw_token)
+{
+  let processed_token = new ProcessedToken();
+  if (raw_token.is_word)
+  {
+    // Check if it is a chord
+    let chord = getChord(raw_token.string);
+    if (chord != null)
+    {
+      processed_token.type = 'chord';
+      processed_token.needs_transposing = true;
+    }
+    else
+    {
+      processed_token.type = 'plaintext';
+      processed_token.needs_transposing = false;
+    }
+  }
+  else if (raw_token.is_comment)
+  {
+    processed_token.type = 'comment';
+    processed_token.needs_transposing = commentNeedsTransposing(processed_token.string);
+  }
+  else
+  {
+    processed_token.type = 'plaintext';
+    processed_token.needs_transposing = false;
+  }
+  processed_token.string = raw_token.string;
+
+  return processed_token;
+}
+
 function getProcessedTokens(raw_tokens)
 {
   let processed_tokens = [];
 
   for (i = 0; i < raw_tokens.length; ++i)
   {
-    let token = new ProcessedToken();
-
-    let curr_token = raw_tokens[i];
-    if (curr_token.is_word)
-    {
-      token.type = 'word';
-    }
-    else if (curr_token.is_word)
-    {
-      token.type = 'comment';
-    }
-    else
-    {
-      token.type = 'plaintext';
-    }
-    token.string = curr_token.string;
-    processed_tokens.push(token);
+    let processed_token = getProcessedToken(raw_tokens[i]);
+    processed_tokens.push(processed_token);
   }
   return processed_tokens;
 }
