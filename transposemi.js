@@ -13,7 +13,7 @@ var transposed_textarea = document.getElementById("transposed_textarea");
 function transpose()
 {
   let original_text = original_textarea.value; 
-  original_textarea.value += '\n\nCHAR_COUNT = ' + original_text.length;
+  //original_textarea.value += '\n\nCHAR_COUNT = ' + original_text.length;
 
   // Get lines
   let lines = original_text.split('\n');
@@ -21,7 +21,7 @@ function transpose()
 
   // Get TextLines
   let text_lines = [];
-  for (i = 0; i < lines.length; ++i)
+  for (let i = 0; i < lines.length; ++i)
   {
     let curr_line = lines[i];
     console.log('\nCURR_LINE (' + i + '): ' + curr_line); // DEBUG
@@ -30,18 +30,18 @@ function transpose()
       let raw_tokens = getRawTokens(curr_line);
       // DEBUG
       console.log('\nRAW_TOKEN_COUNT = ' + raw_tokens.length);
-      for (i = 0; i < raw_tokens.length; ++i)
+      for (let j = 0; j < raw_tokens.length; ++j)
       {
-        console.log('  RAW_TOKEN: ' + raw_tokens[i].descr());
+        console.log('  RAW_TOKEN: ' + raw_tokens[j].descr());
       }
       // DEBUG
 
       let processed_tokens = getProcessedTokens(raw_tokens);
       // DEBUG
       console.log('\nPROCESSED_TOKEN_COUNT = ' + processed_tokens.length);
-      for (i = 0; i < processed_tokens.length; ++i)
+      for (let j = 0; j < processed_tokens.length; ++j)
       {
-        console.log('  PROCESSED_TOKEN: ' + processed_tokens[i].descr());
+        console.log('  PROCESSED_TOKEN: ' + processed_tokens[j].descr());
       }
       // DEBUG
       
@@ -59,7 +59,7 @@ function transpose()
   }
 
   console.log('\nTEXT_LINE_COUNT = ' + text_lines.length);
-  for (i = 0; i < text_lines.length; ++i)
+  for (let i = 0; i < text_lines.length; ++i)
   {
     console.log('  TEXTLINE (' + i + '): ' + text_lines[i].descr());
   }
@@ -70,7 +70,7 @@ function transpose()
   let raw_tokens = getRawTokens(original_text);
   original_textarea.value += '\n\nTOKEN_COUNT = ' + raw_tokens.length;
 
-  for (i = 0; i < raw_tokens.length; ++i)
+  for (let i = 0; i < raw_tokens.length; ++i)
   {
     original_textarea.value += '\n' + raw_tokens[i].descr();
   }
@@ -96,7 +96,7 @@ changeEndDropdownOptions();
 function setStartDropdownOptions()
 {
   let all_chord_names = getFullListOfChords();
-  for (i = 0; i < all_chord_names.length; ++i)
+  for (let i = 0; i < all_chord_names.length; ++i)
   {
     let curr_chord = all_chord_names[i];
     let option = document.createElement('option');
@@ -110,7 +110,7 @@ function setEndDropdownOptions(arr)
 {
   end_dropdown.length = 0;
 
-  for (i = 0; i < arr.length; ++i)
+  for (let i = 0; i < arr.length; ++i)
   {
     let curr_chord = arr[i];
     let option = document.createElement('option');

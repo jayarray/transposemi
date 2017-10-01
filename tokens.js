@@ -24,7 +24,7 @@ class ProcessedToken
 
   descr()
   {
-    return 'TYPE=' + this.type + ', STRING=' + this.string;
+    return 'TYPE=' + this.type + ', STRING=' + this.string + ', NEEDS_TRANSPOSING=' + this.needs_transposing;
   }
 }
 
@@ -38,7 +38,7 @@ class TextLine
 
   addArgsWithAssociatedFormatString(token_args, format_string)
   {
-    for (i = 0; i < token_args.length; ++i)
+    for (let i = 0; i < token_args.length; ++i)
     {
       addArg(token_args[i]);
     }
@@ -57,7 +57,7 @@ class TextLine
 
   hasComments()
   {
-    for (i = 0; i < this.processed_tokens.length; ++i)
+    for (let i = 0; i < this.processed_tokens.length; ++i)
     {
       let curr_token = this.args[i];
       if (curr_token.is_comment)
@@ -75,7 +75,7 @@ class TextLine
       return this.format_str;
     }
 
-    for (i = 0; i < this.processed_tokens.length; ++i)
+    for (let i = 0; i < this.processed_tokens.length; ++i)
     {
       let curr_token = argsArr[i];
       //Object[] args = curr_token.Args();
@@ -136,12 +136,19 @@ function getLines(str)
 
 function commentNeedsTransposing(str)
 {
+  console.log('    COMMENT_NEEDS_TRANS:: str = ' + str) // DEBUG
+  if (str == '()') // FIX: Why is this coming in as null?
+  {
+    return false;
+  }
+
   let content = str.slice(1, str.length - 1); // str[1:last)
+  console.log('    COMMENT_NEEDS_TRANS:: content = ' + content) // DEBUG
   let raw_tokens = getRawTokens(content);
   let processed_tokens = getProcessedTokens(raw_tokens);
 
   let needs_transposing = true;
-  for (i = 0; i < processed_tokens.length; ++i)
+  for (let i = 0; i < processed_tokens.length; ++i)
   {
     let curr_proc_token = processed_tokens[i];
     if (curr_proc_token.type == 'comment' || curr_proc_token.type == 'plaintext')
@@ -163,7 +170,7 @@ function getRawTokens(str)
 
   let start_index = -1;
 
-  for (i = 0; i < str.length; ++i)
+  for (let i = 0; i < str.length; ++i)
   {
     let curr_char = str.charAt(i);
     curr_text += curr_char;
@@ -179,7 +186,7 @@ function getRawTokens(str)
         comment.string = '()';
         raw_tokens.push(comment);
 
-        prev_char = next_char;
+        prev_char = ')';
         i = next_index;
       }
       else
@@ -257,9 +264,9 @@ function getRawTokens(str)
   //console.log('LEFTOVER_STRING = ' + leftover_str); // DEBUG
 
   let is_word = true;
-  for (k = 0; k < leftover_str.length; ++k)
+  for (let i = 0; i < leftover_str.length; ++i)
   {
-    let c = leftover_str.charAt(k);
+    let c = leftover_str.charAt(i);
     if (!isWordChar(c) && !isSpecialSymbol(c))
     {
       is_word = false;
@@ -306,7 +313,7 @@ function getProcessedToken(raw_token)
   else if (raw_token.is_comment)
   {
     processed_token.type = 'comment';
-    processed_token.needs_transposing = commentNeedsTransposing(processed_token.string);
+    processed_token.needs_transposing = commentNeedsTransposing(raw_token.string);
   }
   else
   {
@@ -321,11 +328,10 @@ function getProcessedToken(raw_token)
 function getProcessedTokens(raw_tokens)
 {
   let processed_tokens = [];
-
-  for (i = 0; i < raw_tokens.length; ++i)
+  for (let i = 0; i < raw_tokens.length; ++i)
   {
-    let processed_token = getProcessedToken(raw_tokens[i]);
-    processed_tokens.push(processed_token);
+    let p = getProcessedToken(raw_tokens[i]);
+    processed_tokens.push(p);
   }
   return processed_tokens;
 }
