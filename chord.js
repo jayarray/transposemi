@@ -30,7 +30,7 @@ function isValidMod(str)
 
 function isValidNumber(str)
 {
-  for (i = 0; i < str.length; ++i)
+  for (let i = 0; i < str.length; ++i)
   {
     let curr_char = str.charAt(i);
     if (!isNumber(curr_char))
@@ -112,7 +112,7 @@ function chordLength(str)
 function nextIsNumber(str)
 {
   let number = '';
-  for (i = 0; i < str.length; ++i)
+  for (let i = 0; i < str.length; ++i)
   {
     let curr_char = str.charAt(i);
     if (!isNumber(curr_char))
@@ -127,7 +127,7 @@ function nextIsNumber(str)
 function numberLength(str)
 {
   let number = '';
-  for (i = 0; i < str.length; ++i)
+  for (let i = 0; i < str.length; ++i)
   {
     let curr_char = str.charAt(i);
     if (!isNumber(curr_char))
@@ -155,7 +155,7 @@ function nextIsMod(str)
   if (str.length >= mod_length)
   {
     // Ensure all chars are lowercase
-    for (i = 0; i < mod_length; ++i)
+    for (let i = 0; i < mod_length; ++i)
     {
       let curr_char = str.charAt(i);
       if (!isLowerCase(curr_char))
@@ -176,7 +176,7 @@ function modLength(str)
   if (str.length >= mod_length)
   {
     // Ensure all chars are lowercase
-    for (i = 0; i < mod_length; ++i)
+    for (let i = 0; i < mod_length; ++i)
     {
       let curr_char = str.charAt(i);
       if (!isLowerCase(curr_char))

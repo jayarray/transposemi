@@ -55,7 +55,7 @@ function getMajorChords()
 function getMinorChords()
 {
   let minor_chords = [];
-  for (i = 0; i < chord_names.length; ++i)
+  for (let i = 0; i < chord_names.length; ++i)
   {
     let chord_str = chord_names[i] + 'm';
     minor_chords.push(chord_str);
