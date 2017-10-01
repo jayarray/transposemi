@@ -41,7 +41,7 @@ function transpose()
       console.log('\nPROCESSED_TOKEN_COUNT = ' + processed_tokens.length);
       for (let j = 0; j < processed_tokens.length; ++j)
       {
-        console.log('  PROCESSED_TOKEN: ' + processed_tokens[j].descr());
+        console.log('  ' + processed_tokens[j].descr());
       }
       // DEBUG
       
@@ -59,19 +59,13 @@ function transpose()
   }
 
   console.log('\nTEXT_LINE_COUNT = ' + text_lines.length);
-  for (let i = 0; i < text_lines.length; ++i)
-  {
-    console.log('  TEXTLINE (' + i + '): ' + text_lines[i].descr());
-  }
+  text_lines.forEach((line, i) => console.log('  TEXTLINE (' + i + '): ' + line.descr()));
 
-  // Process TextLines
-  let processed_textlines = getProcessedTextLines(text_lines);
-  // DEBUG
-  console.log('\n\nPROCESSED_TEXTLINES_COUNT = ' + processed_textlines.length);
-  processed_textlines.forEach((line, i) => {
-    console.log('  PROCESSED_TEXTLINE (' + i + '): ' + line.descr())
-  });
-  // DEBUG
+  // Process text_lines (finalize p_tokens & format string)
+  processTextLines(text_lines);
+
+  console.log('\nPROCESSED_LINES = ' + text_lines.length);
+  text_lines.forEach((line, i) => console.log('  TEXTLINE (' + i + '): ' + line.descr()));
 
   // TODO:
   //   * Transpose this shit!
