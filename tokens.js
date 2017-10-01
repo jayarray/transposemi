@@ -335,3 +335,34 @@ function getProcessedTokens(raw_tokens)
   }
   return processed_tokens;
 }
+
+function getProcessedTextLine(text_line)  // NOTE: DO NOT build format string. (Just concatenate during transpoition!)
+{
+  let f_str = '';
+  let final_processed_tokens = [];
+
+  let processed_tokens = text_line.processed_tokens;
+  for (let i = 0; i < processed_tokens.length; ++i)
+  {
+    let p_token = processed_tokens[i];
+    if (p_token.needs_transposing)
+    {
+      final_processed_tokens.push(p_token);
+      f_str += '{?}';
+    }
+    else
+    {
+      f_str += p_token.string;
+    }
+  }
+  
+  let processed_textline = new TextLine();
+  processed_textline.processed_tokens = final_processed_tokens;
+  processed_textline.format_str = f_str;
+  return processed_textline;
+}
+
+function getProcessedTextLines(text_lines)
+{
+  return text_lines.map(line => getProcessedTextLine(line)); // FOR-LOOP (creates an array)
+}

@@ -64,20 +64,17 @@ function transpose()
     console.log('  TEXTLINE (' + i + '): ' + text_lines[i].descr());
   }
 
-  return; // DEBUG
+  // Process TextLines
+  let processed_textlines = getProcessedTextLines(text_lines);
+  // DEBUG
+  console.log('\n\nPROCESSED_TEXTLINES_COUNT = ' + processed_textlines.length);
+  processed_textlines.forEach((line, i) => {
+    console.log('  PROCESSED_TEXTLINE (' + i + '): ' + line.descr())
+  });
+  // DEBUG
 
-  // WORKS (hereon down...)
-  let raw_tokens = getRawTokens(original_text);
-  original_textarea.value += '\n\nTOKEN_COUNT = ' + raw_tokens.length;
-
-  for (let i = 0; i < raw_tokens.length; ++i)
-  {
-    original_textarea.value += '\n' + raw_tokens[i].descr();
-  }
-
-  // Get processed tokens
-  let processed_tokens = getProcessedTokens(raw_);
-  original_textarea.value += '\n\nTOKEN_COUNT = ' + raw_tokens.length;
+  // TODO:
+  //   * Transpose this shit!
 }
 
 
