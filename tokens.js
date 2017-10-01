@@ -327,13 +327,7 @@ function getProcessedToken(raw_token)
 
 function getProcessedTokens(raw_tokens)
 {
-  let processed_tokens = [];
-  for (let i = 0; i < raw_tokens.length; ++i)
-  {
-    let p = getProcessedToken(raw_tokens[i]);
-    processed_tokens.push(p);
-  }
-  return processed_tokens;
+  return raw_tokens.map(token => getProcessedToken(token));
 }
 
 function getProcessedTextLine(text_line)  // NOTE: DO NOT build format string. (Just concatenate during transpoition!)
