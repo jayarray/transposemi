@@ -15,11 +15,42 @@ class RawToken
 
 class ProcessedToken
 {
-  constructor() 
+  constructor(raw_token) 
   {
     this.type = null; // CHORD | COMMENT | PLAINTEXT
     this.needs_transposing = null;
     this.string = null;
+
+    this.initialize(raw_token);
+  }
+
+  initialize(raw_token)
+  {
+    if (raw_token.is_word)
+    {
+      let chord = getChord(raw_token.string);
+      if (chord != null)
+      {
+        this.type = 'chord';
+        this.needs_transposing = true;
+      }
+      else
+      {
+        this.type = 'plaintext';
+        this.needs_transposing = false;
+      }
+    }
+    else if (raw_token.is_comment)
+    {
+      this.type = 'comment';
+      this.needs_transposing = commentNeedsTransposing(raw_token.string);
+    }
+    else
+    {
+      this.type = 'plaintext';
+      this.needs_transposing = false;
+    }
+    this.string = raw_token.string;
   }
 
   descr()
@@ -28,12 +59,156 @@ class ProcessedToken
   }
 }
 
+class Comment
+{
+  constructor(str)
+  {
+    this.open_bracket = null;
+    this.closed_bracket = null;
+    this.string = null;
+    this.format_str = null;
+    this.processed_tokens = [];
+
+    this.initialize(str);
+    this.process();
+  }
+
+  initialize(str)
+  {
+    this.open_bracket = str.charAt(0);
+    this.closed_bracket = str.slice(-1);
+
+    this.string = null;
+    if (this.string.length > 2)
+    {
+      this.string = str.slice(1, str.length - 1); // CONT HERE
+    }
+    else
+    {
+      this.string = '';
+    }
+  }
+
+  process()
+  {
+    // Get format string & transposeable args
+    if (this.string == '')
+    {
+      this.format_str = open_bracket + closed_bracket;
+      return
+    }
+    let raw_tokens = getRawTokens(this.string);
+    let processed_tokens = getProcessedTokens(raw_tokens);
+
+    let final_tokens = [];
+    let index = 0;
+  
+    for (let i = 0; i < processed_tokens.length; ++i)
+    {
+      let curr_token = processed_tokens[i];
+      if (curr_token.type == 'plaintext' || (curr_token.type == 'comment' && !curr_token.needs_transposing) )
+      {
+        this.format_str += curr_token.string;
+      }
+      else
+      {
+        this.format_str += '{' + index + '}';
+        final_tokens.push(curr_token);
+        index += 1;
+      }
+    }
+    this.processed_tokens = final_tokens;
+  }
+
+  needsTransposing()  // FIX: Check that all agrs are transposeable
+  {
+    //console.log('    COMMENT_NEEDS_TRANS:: str = ' + str) // DEBUG
+    if (this.string == '')
+    {
+      return false;
+    }
+  
+    //console.log('    COMMENT_NEEDS_TRANS:: content = ' + content) // DEBUG
+    let raw_tokens = getRawTokens(this.string);
+    let processed_tokens = getProcessedTokens(raw_tokens);
+  
+    let needs_transposing = true;
+    for (let i = 0; i < processed_tokens.length; ++i)
+    {
+      let curr_proc_token = processed_tokens[i];
+      if (curr_proc_token.type == 'plaintext' || curr_proc_token.type == 'comment')
+      {
+        needs_transposing = false;
+        break;
+      }
+    }
+    return needs_transposing;
+  }
+
+  toString()
+  {
+    return this.open_bracket + this.string + this.closed_bracket;
+  }
+}
+
 class TextLine
 {
-  constructor()
+  constructor(str)
   {
     this.processed_tokens = [];
     this.format_str = null;
+    this.needs_transposing = null;
+
+    this.initialize(str);
+    this.process();
+  }
+
+  initialize(str)
+  {
+    if (str.trim() != '')
+    {
+      let raw_tokens = getRawTokens(str);
+      let processed_tokens = getProcessedTokens(raw_tokens);
+        
+      if (processed_tokens.length > 0)
+      {
+        this.processed_tokens = processed_tokens;
+      }
+      text_line = t;
+    }
+  }
+
+  process()
+  {
+    let format_str = '';
+    let f_index = 0;
+    let final_tokens = [];
+  
+    // Build format string
+    this.processed_tokens.forEach(token => {
+      if (token.type == 'plaintext' || (token.type == 'comment' && !commentNeedsTransposing(token.string)) )
+      {
+        format_str += token.string;
+      }
+      else
+      {
+        final_tokens.push(token);
+        format_str += '{' + f_index + '}';
+        f_index += 1;
+      }
+    });
+  
+    // Indicate if needs transposing
+    this.processed_tokens = final_tokens;
+    if (final_tokens.length == 0)
+    {
+      this.needs_transposing = false;
+    }
+    else
+    {
+      this.needs_transposing = true;
+    }
+    this.format_str = format_str;
   }
 
   needsTransposing()
@@ -100,32 +275,6 @@ function isClosedPair(open_bracket, closed_bracket)
 function getLines(str)
 {
   return str.split('\n');
-}
-
-function commentNeedsTransposing(str)
-{
-  console.log('    COMMENT_NEEDS_TRANS:: str = ' + str) // DEBUG
-  if (str == '()') // FIX: Why is this coming in as null?
-  {
-    return false;
-  }
-
-  let content = str.slice(1, str.length - 1); // str[1:last)
-  console.log('    COMMENT_NEEDS_TRANS:: content = ' + content) // DEBUG
-  let raw_tokens = getRawTokens(content);
-  let processed_tokens = getProcessedTokens(raw_tokens);
-
-  let needs_transposing = true;
-  for (let i = 0; i < processed_tokens.length; ++i)
-  {
-    let curr_proc_token = processed_tokens[i];
-    if (curr_proc_token.type == 'plaintext' || curr_proc_token.type == 'comment')
-    {
-      needs_transposing = false;
-      break;
-    }
-  }
-  return needs_transposing;
 }
 
 function getRawTokens(str)
@@ -259,76 +408,12 @@ function getRawTokens(str)
   return raw_tokens.slice(1);  // 1st item and on.
 }
 
-
-function getProcessedToken(raw_token)
-{
-  let processed_token = new ProcessedToken();
-  if (raw_token.is_word)
-  {
-    let chord = getChord(raw_token.string);
-    if (chord != null)
-    {
-      processed_token.type = 'chord';
-      processed_token.needs_transposing = true;
-    }
-    else
-    {
-      processed_token.type = 'plaintext';
-      processed_token.needs_transposing = false;
-    }
-  }
-  else if (raw_token.is_comment)
-  {
-    processed_token.type = 'comment';
-    processed_token.needs_transposing = commentNeedsTransposing(raw_token.string);
-  }
-  else
-  {
-    processed_token.type = 'plaintext';
-    processed_token.needs_transposing = false;
-  }
-  processed_token.string = raw_token.string;
-
-  return processed_token;
-}
-
 function getProcessedTokens(raw_tokens)
 {
-  return raw_tokens.map(token => getProcessedToken(token));
+  return raw_tokens.map(token => new ProcessedToken(token));
 }
 
-function processTextLine(text_line)
+function getTextLines(str_lines)
 {
-  let format_str = '';
-  let f_index = 0;
-  let final_tokens = [];
-
-  text_line.processed_tokens.forEach(token => {
-    if (token.type == 'plaintext' || (token.type == 'comment' && !commentNeedsTransposing(token.string)) )
-    {
-      format_str += token.string;
-    }
-    else
-    {
-      final_tokens.push(token);
-      format_str += '{' + f_index + '}';
-      f_index += 1;
-    }
-  });
-
-  text_line.processed_tokens = final_tokens;
-  if (final_tokens.length == 0)
-  {
-    text_line.needs_transposing = false;
-  }
-  else
-  {
-    text_line.needs_transposing = true;
-  }
-  text_line.format_str = format_str;
-}
-
-function processTextLines(text_lines)
-{
-  text_lines.forEach(line => processTextLine(line));
+  return str_lines.map(line => new TextLine(line));
 }
