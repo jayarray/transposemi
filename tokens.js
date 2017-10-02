@@ -17,7 +17,7 @@ class ProcessedToken
 {
   constructor(raw_token) 
   {
-    this.type = null; // CHORD | COMMENT | PLAINTEXT
+    this.type = null; // CHORD | COMMENT | PLAINTEXT | WORD
     this.needs_transposing = null;
     this.string = null;
 
@@ -36,14 +36,16 @@ class ProcessedToken
       }
       else
       {
-        this.type = 'plaintext';
+        this.type = 'word';
         this.needs_transposing = false;
       }
     }
     else if (raw_token.is_comment)
     {
       this.type = 'comment';
-      this.needs_transposing = commentNeedsTransposing(raw_token.string);
+
+      let comment = new Comment(raw_token.string);
+      this.needs_transposing = comment.needs_transposing;
     }
     else
     {
@@ -65,9 +67,10 @@ class Comment
   {
     this.open_bracket = null;
     this.closed_bracket = null;
-    this.string = null;
-    this.format_str = null;
+    this.string = '';
+    this.format_str = '';
     this.processed_tokens = [];
+    this.needs_transposing = null;
 
     this.initialize(str);
     this.process();
@@ -77,9 +80,7 @@ class Comment
   {
     this.open_bracket = str.charAt(0);
     this.closed_bracket = str.slice(-1);
-
-    this.string = null;
-    if (this.string.length > 2)
+    if (str.length > 2)
     {
       this.string = str.slice(1, str.length - 1); // CONT HERE
     }
@@ -92,57 +93,78 @@ class Comment
   process()
   {
     // Get format string & transposeable args
-    if (this.string == '')
+    if (this.string.trim() == '')
     {
-      this.format_str = open_bracket + closed_bracket;
-      return
+      this.needs_transposing = false
+      return;
     }
+
     let raw_tokens = getRawTokens(this.string);
     let processed_tokens = getProcessedTokens(raw_tokens);
 
     let final_tokens = [];
     let index = 0;
   
+    let word_count = 0;
+    let trans_comment_count = 0;
+    let chord_count = 0;
     for (let i = 0; i < processed_tokens.length; ++i)
     {
       let curr_token = processed_tokens[i];
-      if (curr_token.type == 'plaintext' || (curr_token.type == 'comment' && !curr_token.needs_transposing) )
+      if (curr_token.type == 'plaintext' || (curr_token.type == 'comment' && !curr_token.needs_transposing) || curr_token.type == 'word')
       {
         this.format_str += curr_token.string;
+        if (curr_token.type == 'word')
+        {
+          word_count += 1;
+        }
       }
       else
       {
         this.format_str += '{' + index + '}';
         final_tokens.push(curr_token);
         index += 1;
+
+        if (curr_token.type == 'chord')
+        {
+          chord_count += 1;
+        }
+        else if (curr_token.type == 'comment')
+        {
+          trans_comment_count += 1;
+        }
       }
     }
     this.processed_tokens = final_tokens;
+
+    let all_chords = chord_count == final_tokens.length && word_count == 0;
+    let at_least_one_transposable_comment = trans_comment_count > 0;
+
+    // Check if transposable
+    if (all_chords || at_least_one_transposable_comment)
+    {
+      this.needs_transposing = true; 
+    }
+    else
+    {
+      this.needs_transposing = false;
+      this.format_str = this.string;
+    }
+    this.format_str = this.open_bracket + this.format_str + this.closed_bracket;
+
+    /*console.log('  FINAL_COUNT = ' + final_tokens.length + ', CHORD_COUNT = ' + 
+      chord_count + ', COMM_COUNT = ' + trans_comment_count +
+      ', WORD_COUNT = ' + word_count); // DEBUG*/
   }
 
-  needsTransposing()  // FIX: Check that all agrs are transposeable
+  descr()
   {
-    //console.log('    COMMENT_NEEDS_TRANS:: str = ' + str) // DEBUG
-    if (this.string == '')
+    let d = 'STRING = ' + this.string + ', FORMAT_STR = ' + this.format_str + ', NEEDS_TRANSPOSING = ' + this.needs_transposing;
+    for (let i = 0; i < this.processed_tokens.length; ++i)
     {
-      return false;
+      d += '\n    TOKEN: ' + this.processed_tokens[i].descr();
     }
-  
-    //console.log('    COMMENT_NEEDS_TRANS:: content = ' + content) // DEBUG
-    let raw_tokens = getRawTokens(this.string);
-    let processed_tokens = getProcessedTokens(raw_tokens);
-  
-    let needs_transposing = true;
-    for (let i = 0; i < processed_tokens.length; ++i)
-    {
-      let curr_proc_token = processed_tokens[i];
-      if (curr_proc_token.type == 'plaintext' || curr_proc_token.type == 'comment')
-      {
-        needs_transposing = false;
-        break;
-      }
-    }
-    return needs_transposing;
+    return d;
   }
 
   toString()
@@ -174,7 +196,6 @@ class TextLine
       {
         this.processed_tokens = processed_tokens;
       }
-      text_line = t;
     }
   }
 
@@ -186,9 +207,24 @@ class TextLine
   
     // Build format string
     this.processed_tokens.forEach(token => {
-      if (token.type == 'plaintext' || (token.type == 'comment' && !commentNeedsTransposing(token.string)) )
+      if (token.type == 'plaintext')
       {
         format_str += token.string;
+      }
+      else if (token.type == 'comment')
+      {
+        let comment = new Comment(token.string);
+        console.log('\n  COMMENT: ' + comment.descr()); //DEBUG  // HERE NOW
+        if (comment.needs_transposing)
+        {
+          final_tokens.push(token);
+          format_str += '{' + f_index + '}';
+          f_index += 1;
+        }
+        else
+        {
+          format_str += token.string;
+        }
       }
       else
       {
@@ -209,11 +245,17 @@ class TextLine
       this.needs_transposing = true;
     }
     this.format_str = format_str;
+
+    // Check if needs transposing ()
+    this.needs_transposing = this.needsTransposing();
   }
 
   needsTransposing()
   {
-    return !this.processed_tokens.filter(token => !(token.type == 'comment' || token.needs_transposing)).length;
+    let comment_tokens = this.processed_tokens.filter(token => token.type == 'comment' && token.needs_transposing).length;
+    let chord_tokens = this.processed_tokens.filter(token => token.type == 'chord').length;
+    return comment_tokens.length > 0 || chord_tokens.length > 0;
+    //return !this.processed_tokens.filter(token => !(token.type == 'comment' || token.needs_transposing)).length;
   }
 
   descr()
