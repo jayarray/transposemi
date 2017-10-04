@@ -14,11 +14,47 @@ var minor_keys = ["A", "E", "B", "F#", "C#", "G#", "D#", "A#", "Ab", "Eb", "Bb",
 var minor_sharps = ["A", "E", "B", "F#", "C#", "G#", "D#", "A#"];
 var minor_flats = ["Ab", "Eb", "Bb", "F", "C", "G", "D"];
 
+var scale_types = ['flat', 'sharp'];
+
 //--------------------------------------------------
 
 function getEnumValue(str, arr)
 {
   return arr.indexOf(str);
+}
+
+function getScaleType(chord)
+{
+  let chord_name = chord.key();
+  if (chord.is_minor)
+  {
+    let scale_value = minor_sharps.indexOf(chord_name);
+    if (scale_value >= 0)
+    {
+      return 'sharp';
+    }
+      
+    scale_value = minor_flats.indexOf(chord_name);
+    if (scale_value >= 0)
+    {
+      return 'flat';
+    }   
+  }
+  else
+  {
+    let scale_value = major_sharps.indexOf(chord_name);
+    if (scale_value >= 0)
+    {
+      return 'sharp';
+    }
+      
+    scale_value = major_flats.indexOf(chord_name);
+    if (scale_value >= 0)
+    {
+      return 'flat';
+    } 
+  }
+  return null;
 }
 
 function majorKeyScaleLookup(key)

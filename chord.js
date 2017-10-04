@@ -209,15 +209,15 @@ class Chord
   {
     if (this.is_sharp)
     {
-      return Name + "#";
+      return this.name + "#";
     }
-    else if (IsFlat)
+    else if (this.is_flat)
     {
-      return Name + "b";
+      return this.name + "b";
     }
     else
     {
-      return Name;
+      return this.name;
     }
   }
 
