@@ -28,6 +28,7 @@ class ProcessedToken
   {
     if (raw_token.is_word)
     {
+      console.log('  PROCESSED_TOKEN:: raw_token=' + raw_token.string); // DEBUG: FIX:: Sometimes leaves <space> in chord_str (so it doesnt register as valid)
       let chord = getChord(raw_token.string);
       if (chord != null)
       {
@@ -82,11 +83,7 @@ class Comment
     this.closed_bracket = str.slice(-1);
     if (str.length > 2)
     {
-      this.string = str.slice(1, str.length - 1); // CONT HERE
-    }
-    else
-    {
-      this.string = '';
+      this.string = str.slice(1, str.length - 1);
     }
   }
 
@@ -137,10 +134,9 @@ class Comment
     }
     this.processed_tokens = final_tokens;
 
+    // Check if transposable
     let all_chords = chord_count == final_tokens.length && word_count == 0;
     let at_least_one_transposable_comment = trans_comment_count > 0;
-
-    // Check if transposable
     if (all_chords || at_least_one_transposable_comment)
     {
       this.needs_transposing = true; 
@@ -177,8 +173,9 @@ class TextLine
 {
   constructor(str)
   {
+    this.string = str;
     this.processed_tokens = [];
-    this.format_str = null;
+    this.format_str = '';
     this.needs_transposing = null;
 
     this.initialize(str);
@@ -201,66 +198,79 @@ class TextLine
 
   process()
   {
-    let format_str = '';
     let f_index = 0;
     let final_tokens = [];
   
+    let word_count = 0;
+    let chord_count = 0;
+    let trans_comment_count = 0;
+
     // Build format string
     this.processed_tokens.forEach(token => {
       if (token.type == 'plaintext')
       {
-        format_str += token.string;
+        this.format_str += token.string;
       }
       else if (token.type == 'comment')
       {
         let comment = new Comment(token.string);
-        console.log('\n  COMMENT: ' + comment.descr()); //DEBUG  // HERE NOW
+        //console.log('\n  COMMENT: ' + comment.descr()); //DEBUG  // HERE NOW
         if (comment.needs_transposing)
         {
           final_tokens.push(token);
-          format_str += '{' + f_index + '}';
+          this.format_str += '{' + f_index + '}';
           f_index += 1;
+          trans_comment_count += 1;
         }
         else
         {
-          format_str += token.string;
+          this.format_str += token.string;
         }
       }
       else
       {
-        final_tokens.push(token);
-        format_str += '{' + f_index + '}';
-        f_index += 1;
+        if (token.type == 'word')
+        {
+          word_count += 1;
+          this.format_str += token.string;
+        }
+        else if (token.type == 'chord')
+        {
+          final_tokens.push(token);
+          this.format_str += '{' + f_index + '}';
+          f_index += 1;
+          chord_count += 1;
+        }
       }
     });
-  
-    // Indicate if needs transposing
     this.processed_tokens = final_tokens;
-    if (final_tokens.length == 0)
+
+    // Check if transposable
+    let all_chords = chord_count == final_tokens.length && word_count == 0;
+    let at_least_one_transposable_comment = trans_comment_count > 0;
+    if (all_chords || at_least_one_transposable_comment)
     {
-      this.needs_transposing = false;
+      this.needs_transposing = true; 
     }
     else
     {
-      this.needs_transposing = true;
+      this.needs_transposing = false;
+      this.format_str = this.string;
     }
-    this.format_str = format_str;
-
-    // Check if needs transposing ()
-    this.needs_transposing = this.needsTransposing();
-  }
-
-  needsTransposing()
-  {
-    let comment_tokens = this.processed_tokens.filter(token => token.type == 'comment' && token.needs_transposing).length;
-    let chord_tokens = this.processed_tokens.filter(token => token.type == 'chord').length;
-    return comment_tokens.length > 0 || chord_tokens.length > 0;
-    //return !this.processed_tokens.filter(token => !(token.type == 'comment' || token.needs_transposing)).length;
   }
 
   descr()
   {
-    return 'PROCESSED_TOKENS = ' + this.processed_tokens.length + ', NEEDS_TRANSPOSING = ' + this.needsTransposing() + ', FORMAT_STR = ' + this.format_str;
+    let tokens_str = '';
+    for (let i = 0; i < this.processed_tokens.length; ++i)
+    {
+      tokens_str += '\n    TOKEN: ' + this.processed_tokens[i].descr();
+    }
+
+    return 'PROCESSED_TOKENS = ' + this.processed_tokens.length + 
+      ', NEEDS_TRANSPOSING = ' + this.needs_transposing + 
+      ', FORMAT_STR = ' + this.format_str +
+      '\n  TOKENS:' + tokens_str;
   }
 
   toString()
@@ -405,7 +415,7 @@ function getRawTokens(str)
     else if (!isWordChar(prev_char) && isWordChar(curr_char))
     {
       let plaintext = new RawToken();
-      plaintext.string = str.substring(start_index, i);
+      plaintext.string = str.substring(start_index + 1, i); // REMOVE +1 if it FAILS
       raw_tokens.push(plaintext);
   
       prev_char = curr_char;
