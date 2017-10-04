@@ -253,7 +253,67 @@ class ProcessedTokenBuilder
 
 class TextLine
 {
+  constructor(processed_tokens, format_str, needs_transposing)
+  {
+    this.processed_tokens = processed_tokens;
+    this.format_str = format_str;
+    this.needs_transposing = needs_transposing;
+  }
 
+  descr()
+  {
+    return 'NEEDS_TRANSPOSING=' + this.needs_transposing + ', FORMAT_STR=' + this.format_str + ', PROCESSED_TOKENS=' + this.processed_tokens.length;
+  }
+
+  string()
+  {
+    let str_args = processed_tokens.map(token => token.string);
+    return getFormattedString(this.format_str, str_args);
+  }
+}
+
+function getTextLine(str)
+{
+  let tokenizer = new Tokenizer(str);
+  let raw_tokens = [];
+  while (tokenizer.hasNext())
+  {
+    raw_tokens.push(tokenizer.getNext());
+  }
+
+  let pt_builder = new ProcessedTokenBuilder(raw_tokens);
+  let processed_tokens = [];
+  while (pt_builder.hasNext())
+  {
+    processed_tokens.push(pt_builder.getNext());
+  }
+
+  let f_index = 0;
+  let format_str = '';
+  for (let i = 0; i < processed_tokens.length; ++i)
+  {
+    let curr_token = processed_tokens[i];
+    if (curr_token.needs_transposing)
+    {
+      format_str += '{' + f_index + '}';
+      f_index += 1;
+    }
+    else
+    {
+      format_str += curr_token.string;
+    }
+  }
+
+  let needs_transposing = false;
+  for (let i = 0; i < processed_tokens.length; ++i)
+  {
+    if (processed_tokens[i].needs_transposing)
+    {
+      needs_transposing = true;
+      break;
+    }
+  }
+  return new TextLine(processed_tokens, format_str, needs_transposing);
 }
 
 //-------------------------------------------------
