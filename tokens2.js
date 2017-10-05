@@ -198,9 +198,9 @@ class ProcessedToken
 {
   constructor(string, type, needs_transposing) 
   {
-    this.string = null; 
-    this.type = null;   // CHORD | COMMENT | PLAINTEXT
-    this.needs_transposing = null;
+    this.string = string; 
+    this.type = type;   // CHORD | COMMENT | PLAINTEXT
+    this.needs_transposing = needs_transposing;
   }
 
   descr()

@@ -95,14 +95,12 @@ function transpose()
   let processed_tokens = [];
   while (pbuilder.hasNext())
   {
-    let pt = pbuilder.getNext();
-    processed_tokens.push(pt);
+    processed_tokens.push(pbuilder.getNext());
   }
   console.log('\n\nPROCESSED_TOKENS = ' + processed_tokens.length);
   processed_tokens.forEach(token => console.log('  TOKEN: ' + token.descr()));
 
   return; // DEBUG
-
 
 
   let lines = original_text.split('\n');
