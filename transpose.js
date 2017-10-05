@@ -169,7 +169,7 @@ class TextLineTransposer
           raw_tokens.push(tokenizer.getNext());
         }
 
-        let comment_info = getCommentInfo(raw_tokens, 0);
+        let comment_info = getCommentInfo(raw_tokens, 0); // HERE
         let new_str = this.transposeComment(new Comment(comment_info.open_bracket, 
                                                         comment_info.closed_bracket, 
                                                         comment_info.inner_string, 
@@ -202,7 +202,3 @@ class TextLineTransposer
     return getFormattedString(comment.format_str, transposed_strings);
   }
 }
-  
-
-
-
