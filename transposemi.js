@@ -48,6 +48,16 @@ function setEndDropdownOptions(arr)
   }
 }
 
+function getSelectedStartOption()
+{
+  return start_dropdown.options[start_dropdown.selectedIndex].value;
+}
+
+function getSelectedEndOption()
+{
+  return end_dropdown.options[end_dropdown.selectedIndex].value;
+}
+
 function changeEndDropdownOptions()
 {
   let start_chord = start_dropdown.options[start_dropdown.selectedIndex].value;
@@ -59,6 +69,9 @@ function changeEndDropdownOptions()
   {
     setEndDropdownOptions(getMajorChords());
   }
+
+  end_dropdown.value = getSelectedStartOption();
+
 }
 
 //-----------------------------------
@@ -67,27 +80,68 @@ function changeEndDropdownOptions()
 function transpose()
 {
   let original_text = original_textarea.value; 
-  //original_textarea.value += '\n\nCHAR_COUNT = ' + original_text.length;
+
+  // DEBUG
+  let tokenizer = new Tokenizer(original_text);
+  let raw_tokens = [];
+  while (tokenizer.hasNext())
+  {
+    raw_tokens.push(tokenizer.getNext());
+  }
+  console.log('\nRAW_TOKENS = ' + raw_tokens.length);
+  //raw_tokens.forEach(token => console.log('  TOKEN: ' + token.descr()));
+
+  let pbuilder = new ProcessedTokenBuilder(raw_tokens);
+  let processed_tokens = [];
+  while (pbuilder.hasNext())
+  {
+    let pt = pbuilder.getNext();
+    processed_tokens.push(pt);
+  }
+  console.log('\n\nPROCESSED_TOKENS = ' + processed_tokens.length);
+  processed_tokens.forEach(token => console.log('  TOKEN: ' + token.descr()));
+
+  return; // DEBUG
+
+
 
   let lines = original_text.split('\n');
   console.log('\nTOTAL_LINES = ' + lines.length); // DEBUG
 
-  let text_lines = getTextLines(lines);
+  let text_lines = [];
+  for (let i = 0; i < lines.length; ++i)
+  {
+    let tl = getTextLine(lines[i]);
+    text_lines.push(tl);
+  }
+
   console.log('\nTEXT_LINE_COUNT = ' + text_lines.length);
-  text_lines.forEach((line, i) => console.log('  TEXTLINE (' + i + '): ' + line.descr()));
+  text_lines.forEach((line, i) => console.log('\n  TEXTLINE (' + i + '):: ' + line.descr()));
 
   for (let i = 0; i < text_lines.length; ++i)
   {
     let tokens = text_lines[i].processed_tokens;
     for (let j = 0; j < tokens.length; ++j)
     {
-      console.log('    TOKEN: ' + tokens[j].descr());
+      console.log('    TOKEN: ' + tokens[j].string);
     }
   }
-  
 
-  // TODO:
-  //   * Transpose this shit!
+  return; // DEBUG
+
+  let start_chord = getChord(getSelectedStartOption());
+  let end_chord = getChord(getSelectedEndOption());
+  let textline_transposer = new TextLineTransposer(start_chord, end_chord);
+
+  console.log('\nTRANSPOSING textlines...'); // DEBUG
+  let transposed_text = '';
+  for (let i = 0; i < text_lines.length; ++i)
+  {
+    console.log('\nTRANSPOSING textlines...'); // DEBUG
+    transposed_text += textline_transposer.transpose(text_lines[i]);
+  }
+
+  transposed_textarea.value = transposed_text; 
 }
 
 
