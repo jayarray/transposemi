@@ -144,6 +144,11 @@ class TextLineTransposer
 
   transpose(textline)
   {
+    if (!textline.needs_transposing)
+    {
+      return textline.format_str;
+    }
+
     let processed_tokens = textline.processed_tokens;
     let chord_transposer = new ChordTransposer(this.start_chord, this.end_chord);
     let transposed_strings = [];

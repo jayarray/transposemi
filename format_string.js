@@ -1,6 +1,6 @@
 function getFormattedString(format_str, args) 
 {
-  console.log('\nFORMAT_STR = ' + format_str + ', ARGS = ' + args);
+  //console.log('\nFORMAT_STR = ' + format_str + ', ARGS = ' + args);
 
   let result = '';
 
@@ -8,7 +8,7 @@ function getFormattedString(format_str, args)
   {
     let curr_arg = args[i];
     let placeholder_str = '{' + i + '}';
-    console.log('  i = ' + i +', CURR_PLACEHOLDER: ' + placeholder_str); // DEBUG
+    //console.log('  i = ' + i +', CURR_PLACEHOLDER: ' + placeholder_str); // DEBUG
 
     if (result == '')
     {
@@ -19,7 +19,7 @@ function getFormattedString(format_str, args)
       result = result.replace(placeholder_str, curr_arg);
     }
 
-    console.log('  CURR_RESULT = ' + result); // DEBUG
+    //console.log('  CURR_RESULT = ' + result); // DEBUG
     while (result.includes(placeholder_str))
     {
       result = result.replace(placeholder_str, curr_arg);

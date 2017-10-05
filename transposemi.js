@@ -81,25 +81,6 @@ function transpose()
 {
   let original_text = original_textarea.value; 
 
-  /* DEBUG
-  let tokenizer = new Tokenizer(original_text);
-  let raw_tokens = [];
-  while (tokenizer.hasNext())
-  {
-    raw_tokens.push(tokenizer.getNext());
-  }
-  console.log('\nRAW_TOKENS = ' + raw_tokens.length);
-  //raw_tokens.forEach(token => console.log('  TOKEN: ' + token.descr()));
-
-  let pbuilder = new ProcessedTokenBuilder(raw_tokens);
-  let processed_tokens = [];
-  while (pbuilder.hasNext())
-  {
-    processed_tokens.push(pbuilder.getNext());
-  }
-  console.log('\n\nPROCESSED_TOKENS = ' + processed_tokens.length);
-  processed_tokens.forEach(token => console.log('  TOKEN: ' + token.descr()));
-  */
 
   let lines = original_text.split('\n');
   console.log('\nTOTAL_LINES = ' + lines.length);
@@ -114,8 +95,6 @@ function transpose()
       console.log('    TOKEN: ' + ptoken.string);
     });
   });
-
-  //return; // DEBUG
 
 
   let start_chord = getChord(getSelectedStartOption());
@@ -136,21 +115,21 @@ function transpose()
   let textline_transposer = new TextLineTransposer(start_chord, end_chord);
   console.log('\nTRANSPOSING textlines...'); // DEBUG
 
-  let transposed_text = '';
+  let transposed_textlines = [];
   for (let i = 0; i < text_lines.length; ++i)
   {
     let curr_textline = text_lines[i];
     if (curr_textline.needs_transposing)
     {
-      transposed_text += textline_transposer.transpose(curr_textline);
-    }
-    else
-    {
-      transposed_text += curr_textline.format_str;
+      let t = textline_transposer.transpose(curr_textline);
+      transposed_textlines.push(t);
     }
   }
-  transposed_textarea.value = transposed_text; 
+
+  let formatted_doc = getFormattedString(newline_format_str, transposed_textlines);
+  transposed_textarea.value = formatted_doc; 
 }
+
 
 function getNewlineFormatString(text)
 {
@@ -174,9 +153,8 @@ function getNewlineFormatString(text)
         curr_char = text.charAt(i);
       }
 
-      format_str += '{' + f_index + '}' + curr_char;
+      format_str += '{' + f_index + '}';
       f_index += 1;
-      i += 1;
     }
   }
   return format_str;
