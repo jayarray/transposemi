@@ -102,10 +102,9 @@ function transpose()
   */
 
   let lines = original_text.split('\n');
-  console.log('\nTOTAL_LINES = ' + lines.length); // DEBUG
+  console.log('\nTOTAL_LINES = ' + lines.length);
 
   let text_lines = lines.map(line => getTextLine(line));
-
   console.log('\nTEXT_LINE_COUNT = ' + text_lines.length);
 
   text_lines.forEach((line, i) => {
@@ -115,17 +114,26 @@ function transpose()
     });
   });
 
-  return; // DEBUG
+  //return; // DEBUG
+
 
   let start_chord = getChord(getSelectedStartOption());
   let end_chord = getChord(getSelectedEndOption());
-  let textline_transposer = new TextLineTransposer(start_chord, end_chord);
+  if (start_chord.string() == end_chord.string())
+  {
+    console.log('CHORDS are the same. No transposition needed.');
+    return;
+  }
 
+  console.log('\n\nTRANSPOSING:: FROM=' + start_chord.string() + ', TO=' + end_chord.string());
+
+  let textline_transposer = new TextLineTransposer(start_chord, end_chord);
   console.log('\nTRANSPOSING textlines...'); // DEBUG
+
   let transposed_text = '';
   for (let i = 0; i < text_lines.length; ++i)
   {
-    console.log('\nTRANSPOSING textlines...'); // DEBUG
+    console.log()
     transposed_text += textline_transposer.transpose(text_lines[i]);
   }
 
