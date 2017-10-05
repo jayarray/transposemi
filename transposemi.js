@@ -81,7 +81,7 @@ function transpose()
 {
   let original_text = original_textarea.value; 
 
-  // DEBUG
+  /* DEBUG
   let tokenizer = new Tokenizer(original_text);
   let raw_tokens = [];
   while (tokenizer.hasNext())
@@ -99,31 +99,21 @@ function transpose()
   }
   console.log('\n\nPROCESSED_TOKENS = ' + processed_tokens.length);
   processed_tokens.forEach(token => console.log('  TOKEN: ' + token.descr()));
-
-  return; // DEBUG
-
+  */
 
   let lines = original_text.split('\n');
   console.log('\nTOTAL_LINES = ' + lines.length); // DEBUG
 
-  let text_lines = [];
-  for (let i = 0; i < lines.length; ++i)
-  {
-    let tl = getTextLine(lines[i]);
-    text_lines.push(tl);
-  }
+  let text_lines = lines.map(line => getTextLine(line));
 
   console.log('\nTEXT_LINE_COUNT = ' + text_lines.length);
-  text_lines.forEach((line, i) => console.log('\n  TEXTLINE (' + i + '):: ' + line.descr()));
 
-  for (let i = 0; i < text_lines.length; ++i)
-  {
-    let tokens = text_lines[i].processed_tokens;
-    for (let j = 0; j < tokens.length; ++j)
-    {
-      console.log('    TOKEN: ' + tokens[j].string);
-    }
-  }
+  text_lines.forEach((line, i) => {
+    console.log('\n  TEXTLINE (' + i + '):: ' + line.descr());
+    line.processed_tokens.forEach(ptoken => {
+      console.log('    TOKEN: ' + ptoken.string);
+    });
+  });
 
   return; // DEBUG
 
