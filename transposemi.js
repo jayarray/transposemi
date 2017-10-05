@@ -103,6 +103,7 @@ function transpose()
 
   let lines = original_text.split('\n');
   console.log('\nTOTAL_LINES = ' + lines.length);
+  lines.forEach(line => console.log('LINE=' + line));
 
   let text_lines = lines.map(line => getTextLine(line));
   console.log('\nTEXT_LINE_COUNT = ' + text_lines.length);
@@ -125,7 +126,12 @@ function transpose()
     return;
   }
 
-  console.log('\n\nTRANSPOSING:: FROM=' + start_chord.string() + ', TO=' + end_chord.string());
+  // Keep original format handy
+  let newline_format_str = getNewlineFormatString(original_text);
+  console.log('\n\n*** NEWLINE_FORMAT_STR:\n' + newline_format_str);
+
+
+  console.log('\n\n*** TRANSPOSING:: FROM=' + start_chord.string() + ', TO=' + end_chord.string());
 
   let textline_transposer = new TextLineTransposer(start_chord, end_chord);
   console.log('\nTRANSPOSING textlines...'); // DEBUG
@@ -133,11 +139,47 @@ function transpose()
   let transposed_text = '';
   for (let i = 0; i < text_lines.length; ++i)
   {
-    console.log()
-    transposed_text += textline_transposer.transpose(text_lines[i]);
+    let curr_textline = text_lines[i];
+    if (curr_textline.needs_transposing)
+    {
+      transposed_text += textline_transposer.transpose(curr_textline);
+    }
+    else
+    {
+      transposed_text += curr_textline.format_str;
+    }
   }
-
   transposed_textarea.value = transposed_text; 
+}
+
+function getNewlineFormatString(text)
+{
+  let format_str = '';
+  let f_index = 0;
+
+  let i = 0;
+  while (i < text.length)
+  {
+    let curr_char = text.charAt(i);
+    if (curr_char == '\n')
+    {
+      format_str += curr_char;
+      i += 1;
+    }
+    else
+    {
+      while(i < text.length && curr_char != '\n')
+      {
+        i += 1;
+        curr_char = text.charAt(i);
+      }
+
+      format_str += '{' + f_index + '}' + curr_char;
+      f_index += 1;
+      i += 1;
+    }
+  }
+  return format_str;
 }
 
 
