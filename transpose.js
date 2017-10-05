@@ -162,7 +162,19 @@ class TextLineTransposer
       }
       else if (curr_token.type == 'comment')
       {
-        let new_str = this.transposeComment(new Comment(curr_token.string));
+        let tokenizer = new Tokenizer(curr_token.string);
+        let raw_tokens = [];
+        while (tokenizer.hasNext())
+        {
+          raw_tokens.push(tokenizer.getNext());
+        }
+
+        let comment_info = getCommentInfo(raw_tokens, 0);
+        let new_str = this.transposeComment(new Comment(comment_info.open_bracket, 
+                                                        comment_info.closed_bracket, 
+                                                        comment_info.inner_string, 
+                                                        comment_info.processed_tokens,
+                                                        comment_info.needs_transposing));
         transposed_strings.push(new_str);
       }
     }
