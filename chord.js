@@ -33,7 +33,7 @@ function isValidNumber(str)
   for (let i = 0; i < str.length; ++i)
   {
     let curr_char = str.charAt(i);
-    if (!isNumber(curr_char))
+    if (!isDigit(curr_char))
     {
       return false;
     }
@@ -115,7 +115,7 @@ function nextIsNumber(str)
   for (let i = 0; i < str.length; ++i)
   {
     let curr_char = str.charAt(i);
-    if (!isNumber(curr_char))
+    if (!isDigit(curr_char))
     {
       return false;
     }
@@ -130,7 +130,7 @@ function numberLength(str)
   for (let i = 0; i < str.length; ++i)
   {
     let curr_char = str.charAt(i);
-    if (!isNumber(curr_char))
+    if (!isDigit(curr_char))
     {
       return 0;
     }
