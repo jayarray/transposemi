@@ -12,6 +12,7 @@ var transposed_textarea = document.getElementById("transposed_textarea");
 //---------------------------------------
 // DROPDOWNS
 
+// *** CHORDS
 var start_dropdown = document.getElementById("start_dropdown");
 start_dropdown.addEventListener('change', changeEndDropdownOptions)
 
@@ -69,6 +70,41 @@ function changeEndDropdownOptions()
   end_dropdown.value = getSelectedStartOption();
 }
 
+
+var font_color_dropdown = document.getElementById("font_color_dropdown");
+font_color_dropdown.addEventListener('change', changeFontColor);
+
+let sizes = [];
+for (let i = 8; i <= 30; i += 2)
+{
+  sizes.push(i);
+}
+
+var font_size_dropdown = document.getElementById("font_size_dropdown");
+font_size_dropdown.addEventListener('change', changeFontSize);
+setDropdownOptions(font_size_dropdown, sizes);
+
+
+function getSelectedSize()
+{
+  return font_size_dropdown.options[font_size_dropdown.selectedIndex].value;
+}
+
+function getSelectedColor()
+{
+  return font_color_dropdown.options[font_color_dropdown.selectedIndex].value;
+}
+
+function changeFontSize()
+{
+  // TODO
+}
+
+function changeFontColor()
+{
+  // TODO
+}
+
 //-----------------------------------
 // TRANSPOSE
 
@@ -117,6 +153,7 @@ function transpose()
     if (curr_textline.needs_transposing)
     {
       let t = textline_transposer.transpose(curr_textline);
+      console.log('  TRANSPOSED_LINE: ' + t);
       transposed_textlines.push(t);
     }
   }
