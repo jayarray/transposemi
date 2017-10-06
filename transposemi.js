@@ -4,10 +4,14 @@ var transpose_button = document.getElementById("transpose_button");
 transpose_button.addEventListener('click', transpose);
 
 //---------------------------------------
+// DIVS
+var transposed_text_div = document.getElementById("transposed_text_div");
+
+//----------------------------------------
 // TEXTAREAS
 
 var original_textarea = document.getElementById("original_textarea");
-var transposed_textarea = document.getElementById("transposed_textarea");
+//var transposed_textarea = document.getElementById("transposed_textarea");
 
 //---------------------------------------
 // DROPDOWNS
@@ -75,7 +79,7 @@ var font_color_dropdown = document.getElementById("font_color_dropdown");
 font_color_dropdown.addEventListener('change', changeFontColor);
 
 let sizes = [];
-for (let i = 8; i <= 30; i += 2)
+for (let i = 8; i <= 78; i += 2)
 {
   sizes.push(i);
 }
@@ -159,8 +163,10 @@ function transpose()
   }
 
   console.log('\n\nBUILDING RESULTS...');
-  let formatted_doc = getFormattedString(newline_format_str, transposed_textlines);
-  transposed_textarea.value = formatted_doc; 
+  let formatted_text = getFormattedString(newline_format_str, transposed_textlines);
+  let h = new HtmlText(formatted_text, getSelectedSize(), 'bold', getSelectedColor());
+
+  transposed_text_div.innerHTML = h.html(); 
 }
 
 
