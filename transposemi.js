@@ -1,9 +1,3 @@
-// BUTTONS
-
-var transpose_button = document.getElementById("transpose_button");
-transpose_button.addEventListener('click', transpose);
-
-//---------------------------------------
 // DIVS
 var transposed_text_div = document.getElementById("transposed_text_div");
 
@@ -21,6 +15,7 @@ var start_dropdown = document.getElementById("start_dropdown");
 start_dropdown.addEventListener('change', changeEndDropdownOptions)
 
 var end_dropdown = document.getElementById("end_dropdown");
+end_dropdown.addEventListener('change', endOptionChanged);
 initializeDropdowns();
 changeEndDropdownOptions();
 
@@ -74,10 +69,26 @@ function changeEndDropdownOptions()
   end_dropdown.value = getSelectedStartOption();
 }
 
+function endOptionChanged()
+{
+  console.log('END_OPTION_CHANGHED!');
+  if (getSelectedStartOption() != getSelectedEndOption())
+  {
+    transpose();
+  }
+}
 
+// FONT COLOR
 var font_color_dropdown = document.getElementById("font_color_dropdown");
-font_color_dropdown.addEventListener('change', changeFontColor);
+font_color_dropdown.addEventListener('change', transpose);
 
+function getSelectedColor()
+{
+  return font_color_dropdown.options[font_color_dropdown.selectedIndex].value;
+}
+
+
+// FONT SIZE
 let sizes = [];
 for (let i = 8; i <= 78; i += 2)
 {
@@ -85,28 +96,12 @@ for (let i = 8; i <= 78; i += 2)
 }
 
 var font_size_dropdown = document.getElementById("font_size_dropdown");
-font_size_dropdown.addEventListener('change', changeFontSize);
+font_size_dropdown.addEventListener('change', transpose);
 setDropdownOptions(font_size_dropdown, sizes);
-
 
 function getSelectedSize()
 {
   return font_size_dropdown.options[font_size_dropdown.selectedIndex].value;
-}
-
-function getSelectedColor()
-{
-  return font_color_dropdown.options[font_color_dropdown.selectedIndex].value;
-}
-
-function changeFontSize()
-{
-  // TODO
-}
-
-function changeFontColor()
-{
-  // TODO
 }
 
 //-----------------------------------
@@ -115,7 +110,6 @@ function changeFontColor()
 function transpose()
 {
   let original_text = original_textarea.value; 
-
 
   let lines = original_text.split('\n');
   console.log('\nTOTAL_LINES = ' + lines.length);
