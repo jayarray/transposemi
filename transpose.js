@@ -1,104 +1,44 @@
 class ChordTransposer
 {
-  constructor(start_chord, end_chord)
+  constructor(lookup_dict, start_chord_index, end_chord_index)
   {
-    this.start_chord = null;
-    this.end_chord = null;
-    this.semitones = null;
+    this.start_chord_index = null;
+    this.end_chord_index = null;
     this.lookup = null;
-    this.initialize(start_chord, end_chord);
+    this.semitones = null;
+    this.initialize(lookup_dict, start_chord_index, end_chord_index);
   }
 
-  initialize(start_chord, end_chord)
+  initialize(lookup_dict, start_chord_index, end_chord_index)
   {
-    this.start_chord = start_chord;
-    this.end_chord = end_chord;
-    this.semitones = this.getSemitones(start_chord, end_chord);
-    this.lookup = this.getLookupList(end_chord);
-  }
+    this.start_chord_index = start_chord_index;
+    this.end_chord_index = end_chord_index;
+    this.lookup = lookup_dict;
 
-  convertChordToInt(chord)
-  {
-    let key = chord.key();
-    let sharp_value = getEnumValue(key, sharp_names);
-    if (sharp_value >= 0)
+    // Compute SEMITONES
+    if (start_chord_index < end_chord_index)
     {
-      return sharp_value;
-    }
-    
-    let flat_value = getEnumValue(key, flat_names);
-    if (flat_value >= 0)
-    {
-      return flat_value;
-    }
-    return -1;
-  }
-
-  getSemitones(start_chord, end_chord)
-  {
-    let start_value = this.convertChordToInt(start_chord);
-    let end_value = this.convertChordToInt(end_chord);
-
-    let semitones = 0;
-    if (start_value < end_value)
-    {
-      semitones = end_value - start_value;
+      this.semitones = end_chord_index - start_chord_index;
     }
     else
     {
-      semitones = -(start_value - end_value);
+      this.semitones = -(start_chord_index - end_chord_index);
     }
-    return semitones;
-  }
-
-  getNewChordValue(chord)
-  {
-    let chord_index = this.convertChordToInt(chord);
-    let new_value = ((chord_index + this.semitones) % this.lookup.length);
-    if (new_value < 0)
-    {
-      new_value = new_value + this.lookup.length;
-    }
-    return new_value
-  }
-
-  getLookupList(end_chord)
-  {
-    let scale_type = getScaleType(end_chord);
-    if (end_chord.is_minor)
-    {
-      if (scale_type == 'flat')
-      {
-        return minor_flats;
-      }
-      else
-      {
-        return minor_sharps;
-      }
-    }
-    else
-    {
-      if (scale_type == 'flat')
-      {
-        return major_flats;
-      }
-      else
-      {
-        return major_sharps;
-      }
-    }
-    return null;
   }
 
   transpose(chord)
   {  
-    //let lookup = this.getLookupList(this.end_chord);
-    //let semitones = this.getSemitones(this.start_chord, this.end_chord);
-    let new_chord_value = this.getNewChordValue(chord, this.semitones);
-    let new_chord_name = this.lookup[new_chord_value];
-  
-    let transposed_chord = this.getTransposedChord(chord, new_chord_name);
-    return transposed_chord;
+    let chord_index = convertChordToInt(chord);
+    let new_value = ((chord_index + this.semitones) % Object.keys(this.lookup).length); 
+
+    if (new_value < 0)
+    {
+      new_value = new_value + Object.keys(this.lookup).length;
+    }
+    
+    let new_chord_name = this.lookup[new_value.toString()]; // Remove ".toString()" if FAILS
+    let new_chord = this.getTransposedChord(chord, new_chord_name);
+    return new_chord;
   }
 
   getTransposedChord(chord, new_chord_name)
@@ -132,10 +72,10 @@ class ChordTransposer
 
   descr()
   {
-    return 'START= ' + this.start_chord.string() +
-           ', END=' + this.end_chord.string() + 
+    return 'START_INDEX= ' + this.start_chord_index +
+           ', END_INDEX=' + this.end_chord_index + 
            ', SEMITONES=' + this.semitones + 
-           ', LOOKUP=' + this.lookup;
+           ', LOOKUP=' + JSON.stringify(this.lookup);
   }
 }
 
@@ -145,9 +85,27 @@ class TextLineTransposer
 {
   constructor(start_chord, end_chord)
   {
+    this.start_chord = null;
+    this.start_chord_index = null;
+    this.end_chord = null;
+    this.end_chord_index = null;
+    this.lookup_dict = null;
+    this.chord_transposer = null;
+
+    this.initialize(start_chord, end_chord);
+  }
+
+  initialize(start_chord, end_chord)
+  {
     this.start_chord = start_chord;
+    this.start_chord_index = convertChordToInt(start_chord);
+
     this.end_chord = end_chord;
-    this.chord_transposer = new ChordTransposer(start_chord, end_chord);
+    this.end_chord_index = convertChordToInt(end_chord);
+
+    this.lookup_dict = this.getLookupDictionary(end_chord);
+
+    this.chord_transposer = new ChordTransposer(this.lookup_dict, this.start_chord_index, this.end_chord_index);
     console.log('CHORD_TRANSPOSER:: ' + this.chord_transposer.descr());
   }
 
@@ -213,5 +171,39 @@ class TextLineTransposer
       }
     }
     return getFormattedString(comment.format_str, transposed_strings);
+  }
+
+  getLookupDictionary(end_chord)
+  {
+    let c_scale = new ChromaticScale();
+
+    let scale_value = -1;
+    let chord_name = end_chord.key();
+    if (end_chord.is_minor)
+    {
+      scale_value = c_scale.minor_key_scale_lookup[chord_name];
+      if (scale_value == null)
+      {
+         scale_value = c_scale.major_key_scale_lookup[chord_name];
+      }
+    }
+    else
+    {
+      scale_value = c_scale.major_key_scale_lookup[chord_name];
+      if (scale_value == null)
+      {
+        scale_value = c_scale.minor_key_scale_lookup[chord_name];
+      }
+    }
+
+    // Return the right dictonary
+    if (scale_value == c_scale.scale_type.indexOf('sharp'))
+    {
+      console.log('  Returning SHARP lookup_dict...');
+      return c_scale.sharp_notes_lookup;
+    }
+
+    console.log('  Returning FLAT lookup_dict...');
+    return c_scale.flat_notes_lookup;
   }
 }
