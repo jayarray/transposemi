@@ -13,38 +13,33 @@ var transposed_textarea = document.getElementById("transposed_textarea");
 // DROPDOWNS
 
 var start_dropdown = document.getElementById("start_dropdown");
-setStartDropdownOptions();
 start_dropdown.addEventListener('change', changeEndDropdownOptions)
 
 var end_dropdown = document.getElementById("end_dropdown");
-setEndDropdownOptions(chord_names);
+initializeDropdowns();
 changeEndDropdownOptions();
 
 
-function setStartDropdownOptions()
+function initializeDropdowns()
 {
-  let all_chord_names = getFullListOfChords();
-  for (let i = 0; i < all_chord_names.length; ++i)
-  {
-    let curr_chord = all_chord_names[i];
-    let option = document.createElement('option');
-    option.value = curr_chord;
-    option.text = curr_chord;
-    start_dropdown.appendChild(option);
-  }
+  let c_scale = new ChromaticScale();
+  setDropdownOptions(start_dropdown, c_scale.allChords());
+  setDropdownOptions(end_dropdown, c_scale.allChords());
 }
 
-function setEndDropdownOptions(arr)
+function setDropdownOptions(dropdown, arr)
 {
-  end_dropdown.length = 0;
+  // Clear current list
+  dropdown.length = 0;
 
+  // Populate list
   for (let i = 0; i < arr.length; ++i)
   {
     let curr_chord = arr[i];
     let option = document.createElement('option');
     option.value = curr_chord;
     option.text = curr_chord;
-    end_dropdown.appendChild(option);
+    dropdown.appendChild(option);
   }
 }
 
@@ -60,18 +55,18 @@ function getSelectedEndOption()
 
 function changeEndDropdownOptions()
 {
+  let c_scale = new ChromaticScale();
   let start_chord = start_dropdown.options[start_dropdown.selectedIndex].value;
+
   if (start_chord.endsWith('m'))
   {
-    setEndDropdownOptions(getMinorChords());
+    setDropdownOptions(end_dropdown, c_scale.minor_chords);
   }
   else
   {
-    setEndDropdownOptions(getMajorChords());
+    setDropdownOptions(end_dropdown, c_scale.major_chords);
   }
-
   end_dropdown.value = getSelectedStartOption();
-
 }
 
 //-----------------------------------
@@ -126,6 +121,7 @@ function transpose()
     }
   }
 
+  console.log('\n\nBUILDING RESULTS...');
   let formatted_doc = getFormattedString(newline_format_str, transposed_textlines);
   transposed_textarea.value = formatted_doc; 
 }
