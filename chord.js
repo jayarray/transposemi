@@ -20,12 +20,14 @@ function isValidSymbol(char)
 
 function isValidChordName(str)
 {
-   return str.length <= max_chord_length && chord_names.includes(str);
+  let c_scale = new ChromaticScale();
+  return str.length <= max_chord_length && c_scale.chord_names.includes(str);
 }
 
 function isValidMod(str)
 {
-   return str.length <= max_mod_length && mod_names.includes(str);
+  let c_scale = new ChromaticScale();
+  return str.length <= max_mod_length && c_scale.mod_names.includes(str);
 }
 
 function isValidNumber(str)
