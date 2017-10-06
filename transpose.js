@@ -67,6 +67,8 @@ class ChordTransposer
       let new_name = new_chord_name.substring(0, 1);
       new_chord.name = new_name;
     }
+    new_chord.modifier = chord.modifier;
+    
     return new_chord;
   }
 
