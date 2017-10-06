@@ -166,7 +166,7 @@ function nextIsMod(str)
       }
     }
     
-    let mod = str.substring(0, mod_length); // HERE
+    let mod = str.substring(0, mod_length);
     return isValidMod(mod);
   }
   return false;
@@ -376,6 +376,7 @@ function getChord(str)
                 }
                 return chord; // CHORD m MOD
               }
+              return null; // ADDED 10-6-2017.  Remove if FAILS!
             }
           }
           return chord; // CHORD m
