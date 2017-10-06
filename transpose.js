@@ -129,6 +129,14 @@ class ChordTransposer
     }
     return new_chord;
   }
+
+  descr()
+  {
+    return 'START= ' + this.start_chord.string() +
+           ', END=' + this.end_chord.string() + 
+           ', SEMITONES=' + this.semitones + 
+           ', LOOKUP=' + this.lookup;
+  }
 }
 
 //--------------------------------------
@@ -140,6 +148,7 @@ class TextLineTransposer
     this.start_chord = start_chord;
     this.end_chord = end_chord;
     this.chord_transposer = new ChordTransposer(start_chord, end_chord);
+    console.log('CHORD_TRANSPOSER:: ' + this.chord_transposer.descr());
   }
 
   transpose(textline)
@@ -150,7 +159,6 @@ class TextLineTransposer
     }
 
     let processed_tokens = textline.processed_tokens;
-    let chord_transposer = new ChordTransposer(this.start_chord, this.end_chord);
     let transposed_strings = [];
 
     for (let i = 0; i < processed_tokens.length; ++i)
@@ -161,7 +169,7 @@ class TextLineTransposer
         let chord = getChord(curr_token.string);
         if (chord != null)
         {
-          let transposed_chord = chord_transposer.transpose(chord);
+          let transposed_chord = this.chord_transposer.transpose(chord);
           transposed_strings.push(transposed_chord.string());
         }
       }
