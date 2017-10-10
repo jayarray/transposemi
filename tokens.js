@@ -379,9 +379,9 @@ function processComment2(comment, format_str, transposable_tokens)
   let processed_tokens = pt_builder.getAll();
  
   format_str += comment.open_bracket;
-  for (let i = 0; i < comment.processed_tokens.length; ++i)
+  for (let i = 0; i < processed_tokens.length; ++i)
   {
-    let curr_token = comment.processed_tokens[i];
+    let curr_token = processed_tokens[i];
     if (curr_token.needs_transposing)
     {
       if (curr_token.type == 'chord')
@@ -401,11 +401,11 @@ function processComment2(comment, format_str, transposable_tokens)
           let curr_p_token = comment.processed_tokens[k];
           if (curr_p_token.needs_transposing)
           {
-            processComment2(comment, format_str, transposable_tokens);
+            format_str = processComment2(comment, format_str, transposable_tokens); // HERE NOW 777
           }
           else
           {
-            format_str += full_string;
+            format_str += curr_p_token.string;
           }
         }
       }
@@ -415,56 +415,7 @@ function processComment2(comment, format_str, transposable_tokens)
       format_str += curr_token.string;
     }
   }
-  format_str += comment.closed_bracket;
-}
-
-function processComment3(comment, format_str, transposable_tokens)
-{
-  let tokenizer = new Tokenizer(comment.inner_string);
-  let raw_tokens = tokenizer.getAll();
-
-  let pt_builder = new ProcessedTokenBuilder(raw_tokens);
-  let processed_tokens = pt_builder.getAll();
- 
-  format_str += comment.open_bracket;
-  for (let i = 0; i < comment.processed_tokens.length; ++i)
-  {
-    let curr_token = comment.processed_tokens[i];
-    if (curr_token.needs_transposing)
-    {
-      if (curr_token.type == 'chord')
-      {
-        transposable_tokens.push(curr_token);
-        format_str += '{?}';
-      }
-      else if (curr_token.type == 'comment')
-      {
-        let open_bracket = curr_token.string.charAt(0);
-        let closed_bracket = curr_token.string.charAt(curr_token.string.length - 1);
-        let inner_string = curr_token.string.substring(1, curr_token.string.length - 1);
-        let comment = new Comment(open_bracket, closed_bracket, inner_string);
-
-        for (let k = 0; k < comment.processed_tokens.length; ++k)
-        {
-          let curr_p_token = comment.processed_tokens[k];
-          if (curr_p_token.needs_transposing)
-          {
-            processComment3(comment, format_str, transposable_tokens);
-          }
-          else
-          {
-            format_str += full_string;
-          }
-        }
-      }
-    }
-    else
-    {
-      format_str += curr_token.string;
-    }
-  }
-  format_str += comment.closed_bracket;
-  return format_str;
+  return format_str + comment.closed_bracket; // REMOVE return keyword if FAILS
 }
 
 //----------------------------------------------
@@ -666,7 +617,7 @@ function getTextLine(str)
       
       if (comment.needs_transposing)
       {
-        processComment3(comment, format_str, transposable_tokens); // CONT HERE!!!!
+        format_str += processComment2(comment, format_str, transposable_tokens); // CONT HERE!!!!
       }
       else
       {
