@@ -71,7 +71,6 @@ function changeEndDropdownOptions()
 
 function endOptionChanged()
 {
-  console.log('END_OPTION_CHANGHED!');
   if (getSelectedStartOption() != getSelectedEndOption())
   {
     transpose();
@@ -141,26 +140,41 @@ function transpose()
 
   console.log('\n\n*** TRANSPOSING:: FROM=' + start_chord.string() + ', TO=' + end_chord.string());
 
+  return; // DEBUG
+
   let textline_transposer = new TextLineTransposer(start_chord, end_chord);
   console.log('\nTRANSPOSING textlines...'); // DEBUG
 
+  // Transpose and convert to HTML
+  let chrod_transposer = new ChordTransposer(start_chord, end_chord);
   let transposed_textlines = [];
   for (let i = 0; i < text_lines.length; ++i)
   {
-    let curr_textline = text_lines[i];
-    if (curr_textline.needs_transposing)
+    // Transpose transposable tokens
+    let curr_textline_tokens = text_lines[i].processed_tokens;
+    for (let j = 0; j < curr_textline_tokens.length; ++j)
     {
-      let t = textline_transposer.transpose(curr_textline);
-      console.log('  TRANSPOSED_LINE: ' + t);
-      transposed_textlines.push(t);
+      let curr_token = curr_textline_tokens[j];
+      
+      //let chord = ; //ChordTransposer.transpose()
     }
   }
 
-  console.log('\n\nBUILDING RESULTS...');
-  let formatted_text = getFormattedString(newline_format_str, transposed_textlines);
-  let h = new HtmlText(formatted_text, getSelectedSize(), 'bold', getSelectedColor());
 
-  transposed_text_div.innerHTML = h.html(); 
+
+  // Convert lines to formatted HTML
+  let formatted_lines = [];
+  for (let i = 0; i < transposed_textlines.length; ++i)
+  {
+    let curr_textline = transposed_textlines[i];
+    let html_str = toHtml(curr_textline, getSelectedSize(), getSelectedColor());
+    formatted_lines.push(html_str);
+  }
+
+  console.log('\n\nBUILDING RESULTS...');
+  let formatted_html = getFormattedString(newline_format_str, formatted_lines);
+
+  transposed_text_div.innerHTML = formatted_html; 
 }
 
 
