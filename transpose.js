@@ -1,42 +1,37 @@
 class ChordTransposer
 {
-  constructor(lookup_dict, start_chord_index, end_chord_index)
+  constructor(start_chord, end_chord)
   {
-    this.start_chord_index = null;
-    this.end_chord_index = null;
-    this.lookup = null;
+    this.start_chord = start_chord;
+    this.start_chord_index = convertChordToInt(start_chord);
+
+    this.end_chord = end_chord;
+    this.end_chord_index = convertChordToInt(end_chord);
+
+    this.lookup_dict = this.getLookupDictionary(end_chord);
+
     this.semitones = null;
-    this.initialize(lookup_dict, start_chord_index, end_chord_index);
-  }
-
-  initialize(lookup_dict, start_chord_index, end_chord_index)
-  {
-    this.start_chord_index = start_chord_index;
-    this.end_chord_index = end_chord_index;
-    this.lookup = lookup_dict;
-
-    // Compute SEMITONES
-    if (start_chord_index < end_chord_index)
+    if (this.start_chord_index < this.end_chord_index)
     {
-      this.semitones = end_chord_index - start_chord_index;
+      this.semitones = this.end_chord_index - this.start_chord_index;
     }
     else
     {
-      this.semitones = -(start_chord_index - end_chord_index);
+      this.semitones = -(this.start_chord_index - this.end_chord_index);
     }
   }
 
   transpose(chord)
   {  
     let chord_index = convertChordToInt(chord);
-    let new_value = ((chord_index + this.semitones) % Object.keys(this.lookup).length); 
+    let new_value = ((chord_index + this.semitones) % Object.keys(this.lookup_dict).length); 
 
     if (new_value < 0)
     {
-      new_value = new_value + Object.keys(this.lookup).length;
+      new_value = new_value + Object.keys(this.lookup_dict).length;
     }
     
-    let new_chord_name = this.lookup[new_value.toString()]; // Remove ".toString()" if FAILS
+    let new_chord_name = this.lookup_dict[new_value.toString()]; // Remove ".toString()" if FAILS
     let new_chord = this.getTransposedChord(chord, new_chord_name);
     return new_chord;
   }
@@ -72,12 +67,46 @@ class ChordTransposer
     return new_chord;
   }
 
+  getLookupDictionary(end_chord)
+  {
+    let c_scale = new ChromaticScale();
+
+    let scale_value = -1;
+    let chord_name = end_chord.key();
+    if (end_chord.is_minor)
+    {
+      scale_value = c_scale.minor_key_scale_lookup[chord_name];
+      if (scale_value == null)
+      {
+         scale_value = c_scale.major_key_scale_lookup[chord_name];
+      }
+    }
+    else
+    {
+      scale_value = c_scale.major_key_scale_lookup[chord_name];
+      if (scale_value == null)
+      {
+        scale_value = c_scale.minor_key_scale_lookup[chord_name];
+      }
+    }
+
+    // Return the right dictonary
+    if (scale_value == c_scale.scale_type.indexOf('sharp'))
+    {
+      console.log('  Returning SHARP lookup_dict...');
+      return c_scale.sharp_notes_lookup;
+    }
+
+    console.log('  Returning FLAT lookup_dict...');
+    return c_scale.flat_notes_lookup;
+  }
+
   descr()
   {
     return 'START_INDEX= ' + this.start_chord_index +
            ', END_INDEX=' + this.end_chord_index + 
            ', SEMITONES=' + this.semitones + 
-           ', LOOKUP=' + JSON.stringify(this.lookup);
+           ', LOOKUP=' + JSON.stringify(this.lookup_dict);
   }
 }
 
@@ -87,27 +116,7 @@ class TextLineTransposer
 {
   constructor(start_chord, end_chord)
   {
-    this.start_chord = null;
-    this.start_chord_index = null;
-    this.end_chord = null;
-    this.end_chord_index = null;
-    this.lookup_dict = null;
-    this.chord_transposer = null;
-
-    this.initialize(start_chord, end_chord);
-  }
-
-  initialize(start_chord, end_chord)
-  {
-    this.start_chord = start_chord;
-    this.start_chord_index = convertChordToInt(start_chord);
-
-    this.end_chord = end_chord;
-    this.end_chord_index = convertChordToInt(end_chord);
-
-    this.lookup_dict = this.getLookupDictionary(end_chord);
-
-    this.chord_transposer = new ChordTransposer(this.lookup_dict, this.start_chord_index, this.end_chord_index);
+    this.chord_transposer = new ChordTransposer(start_chord, end_chord);
     console.log('CHORD_TRANSPOSER:: ' + this.chord_transposer.descr());
   }
 
@@ -143,11 +152,9 @@ class TextLineTransposer
         }
 
         let comment_info = getCommentInfo(raw_tokens, 0); // HERE
-        let new_str = this.transposeComment(new Comment(comment_info.open_bracket, 
+        let new_str = this.transposeComment(new Comment2(comment_info.open_bracket, 
                                                         comment_info.closed_bracket, 
-                                                        comment_info.inner_string, 
-                                                        comment_info.processed_tokens,
-                                                        comment_info.needs_transposing));
+                                                        comment_info.inner_string));
         transposed_strings.push(new_str);
       }
     }
