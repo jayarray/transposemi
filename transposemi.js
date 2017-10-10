@@ -137,14 +137,14 @@ function transpose()
   let newline_format_str = getNewlineFormatString(original_text);
   console.log('\n\n*** NEWLINE_FORMAT_STR:\n' + newline_format_str);
 
-
   console.log('\n\n*** TRANSPOSING:: FROM=' + start_chord.string() + ', TO=' + end_chord.string());
 
-  return; // DEBUG
 
   let textline_transposer = new TextLineTransposer(start_chord, end_chord);
   console.log('\nTRANSPOSING textlines...'); // DEBUG
 
+  return; // DEBUG
+  
   // Transpose and convert to HTML
   let chrod_transposer = new ChordTransposer(start_chord, end_chord);
   let transposed_textlines = [];
