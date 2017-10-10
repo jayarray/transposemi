@@ -1,3 +1,4 @@
+// RAW TOKENS
 class RawToken
 {
   constructor(char, type) 
@@ -54,60 +55,85 @@ class Tokenizer
 
     return next;
   }
+
+  getAll()
+  {
+    let raw_tokens = [];
+    while (this.hasNext())
+    {
+      raw_tokens.push(this.getNext());
+    }
+    return raw_tokens;
+  }
 }
 
-class Comment
+//------------------------------------------------
+// COMMENTS
+
+class Comment2
 {
-  constructor(open_bracket, closed_bracket, inner_string, processed_tokens, needs_transposing)
+  constructor(open_bracket, closed_bracket, inner_string)
   {
     this.open_bracket = open_bracket;
     this.closed_bracket = closed_bracket;
     this.inner_string = inner_string;
-    this.processed_tokens = processed_tokens;
-    this.needs_transposing = needs_transposing;
+
+    let t_info = getTransposingInfo(inner_string);
+    this.needs_transposing = t_info.needs_transposing;                         // Indicates there is something that needs transposing
+    this.non_comments_need_transposing = t_info.non_comments_need_transposing; // Indicates all current-level non-comment tokens can be plaintext.
+    this.processed_tokens = t_info.processed_tokens;
   }
 
-  formatString()
+  getTransposingInfo(inner_string)
   {
-    if (this.inner_string == '')
+    let tokenizer = new Tokenizer(inner_string);
+    let raw_tokens = tokenizer.getAll();
+
+    let pt_builder = new ProcessedTokenBuilder(raw_tokens);
+    let processed_tokens = pt_builder.getAll();
+
+    let transposable_tokens = [];
+    for (let i = 0; processed_tokens.length; ++i)
     {
-      return open_bracket + closed_bracket;
+      let curr_token = processed_tokens[i];
     }
 
-    let fs_info = getFormatStringInfo(this.processed_tokens);
-    return fs_info.format_str;
-  }
+    let token_counts = getTokenCounts(processed_tokens);
+    if (token_counts.comments > 0)
+    {
+      let transposable_comment_count = 0;
+      
+      let comment_tokens = [];
+      for (let i = 0; i < processed_tokens.length; ++i)
+      {
+        let curr_pt = processed_tokens[i];
+        if (curr_pt.type == 'comment')
+        {
+          let inner_comment = getComment(curr_pt.string);
+          if (inner_comment.needsTransposing())
+          {
+            transposable_comment_count += 1;
+          }
+        }
+      }
 
-  string()
-  {
-    return this.open_bracket + this.inner_string + this.closed_bracket;
-  }
-
-  descr()
-  {
-    return 'NEEDS_TRANSPOSING=' + this.needs_transposing + ', COMMENT=' + this.string() + ', PROCESSED_TOKENS=' + this.processed_tokens.length;
+      let needs_transposing = transposable_comment_count > 0 || (token_counts.chords > 0 && token_counts.words == 0);
+      let non_comments_need_transposing = token_counts.chords > 0 && token_counts.words == 0;
+      return {'needs_transposing': needs_transposing, 'non_comments_need_transposing': non_comments_need_transposing, 'processed_tokens': processed_tokens};
+    }
+    
+    let needs_transposing = token_counts.chords > 0 && token_counts.words == 0;
+    return {'needs_transposing': needs_transposing, 'non_comments_need_transposing': needs_transposing,  'processed_tokens': processed_tokens};
   }
 }
 
-class CommentInfo
+function getComment(str)
 {
-  constructor(string, start_index, end_index, needs_transposing, open_bracket, closed_bracket, inner_string, processed_tokens)
-  {
-    this.string = string
-    this.start_index = start_index;
-    this.end_index = end_index;
-    this.needs_transposing = needs_transposing;
+  let tokenizer = new Tokenizer(str);
+  let raw_tokens = tokenizer.getAll();
 
-    this.open_bracket = open_bracket;
-    this.closed_bracket = closed_bracket;
-    this.inner_string = inner_string;
-    this.processed_tokens = processed_tokens; 
-  }
-
-  descr()
-  {
-    return 'START=' + this.start_index + ', END=' + this.end_index + ', NEEDS_TRANSPOSING=' + this.needs_transposing + ', STRING=' + this.string;
-  }
+  let c = getCommentInfo(raw_tokens, 0);
+  return new Comment2(c.open_bracket, c.closed_bracket, c.inner_string);
 }
 
 function getCommentInfo(raw_tokens, start_index)
@@ -188,6 +214,129 @@ function getCommentInfo(raw_tokens, start_index)
   return null;
 }
 
+class Comment
+{
+  constructor(open_bracket, closed_bracket, inner_string, processed_tokens, needs_transposing)
+  {
+    this.open_bracket = open_bracket;
+    this.closed_bracket = closed_bracket;
+    this.inner_string = inner_string;
+    this.processed_tokens = processed_tokens;
+    this.needs_transposing = needs_transposing;
+  }
+
+  formatString()
+  {
+    if (this.inner_string == '')
+    {
+      return open_bracket + closed_bracket;
+    }
+
+    let fs_info = getFormatStringInfo(this.processed_tokens);
+    return fs_info.format_str;
+  }
+
+  string()
+  {
+    return this.open_bracket + this.inner_string + this.closed_bracket;
+  }
+
+  descr()
+  {
+    return 'NEEDS_TRANSPOSING=' + this.needs_transposing + ', COMMENT=' + this.string() + ', PROCESSED_TOKENS=' + this.processed_tokens.length;
+  }
+}
+
+class CommentInfo
+{
+  constructor(string, start_index, end_index, needs_transposing, open_bracket, closed_bracket, inner_string, processed_tokens)
+  {
+    this.string = string
+    this.start_index = start_index;
+    this.end_index = end_index;
+    this.needs_transposing = needs_transposing;
+
+    this.open_bracket = open_bracket;
+    this.closed_bracket = closed_bracket;
+    this.inner_string = inner_string;
+    this.processed_tokens = processed_tokens; 
+  }
+
+  descr()
+  {
+    return 'START=' + this.start_index + ', END=' + this.end_index + ', NEEDS_TRANSPOSING=' + this.needs_transposing + ', STRING=' + this.string;
+  }
+}
+
+function getProcessedTokenCounts(processed_tokens)
+{
+  let words = 0;
+  let chords = 0;
+  let comments = 0;
+
+  for (let i = 0; i < processed_tokens.length; ++i)
+  {
+    let curr_token = processed_tokens[i];
+    if (curr_token.type == 'chord')
+    {
+      chords += 1;
+    }
+    else if (curr_token.type == 'comment')
+    {
+      comments += 1;
+    }
+    else if (curr_token.type == 'word')
+    {
+      words += 1;
+    }
+  }
+  return {'words': words, 'chords': chords, 'comments': comments};
+}
+
+function processComment(comment, f_index, format_str, transposable_tokens) // comment is a processed_token
+{
+  let open_bracket = comment.string.charAt(0);
+  let closed_bracket = comment.string.charAt(comment.string.length - 1);
+
+  let tokenizer = new Tokenizer(comment.inner_string);
+  let raw_tokens = tokenizer.getAll();
+
+  let pt_builder = new ProcessedTokenBuilder(raw_tokens);
+  let processed_tokens = pt_builder.getAll();
+ 
+  format_str += open_bracket;
+  for (let i = 0; i < processed_tokens.length; ++i)
+  {
+    let curr_token = processed_tokens.length[i];
+    if (curr_token.needs_transposing)
+    {
+      if (curr_token.type == 'chord')
+      {
+        transposable_tokens.push(curr_token);
+        format_str += '{' + f_index + '}';
+        f_index += 1;
+      }
+      else if (curr_token.type == 'comment')
+      {
+        let result = getCommentArgsAndFormatString(curr_token, f_index, format_str, transposable_tokens);
+        for (let k = 0; k < result.processed_tokens.length; ++k)
+        {
+          transposable_tokens.push(result.transposable_tokens[i]);
+          format_str += '{' + f_index + '}';
+          f_index += 1;
+        }
+      }
+    }
+    else
+    {
+      format_str += curr_token.string;
+    }
+  }
+  format_str += closed_bracket;
+}
+
+//----------------------------------------------
+// WORDS
 class WordInfo
 {
   constructor(string, start_index, end_index, needs_transposing)
@@ -312,6 +461,16 @@ class ProcessedTokenBuilder
       return new ProcessedToken(curr_token.char, 'plaintext', false);
     }
   }
+
+  getAll()
+  {
+    let processed_tokens = [];
+    while (this.hasNext())
+    {
+      processed_tokens.push(this.getNext());
+    }
+    return processed_tokens;
+  }
 }
 
 class TextLine
@@ -353,7 +512,27 @@ function getTextLine(str)
 
   // Gather transposable tokens & build format string
   console.log('\nPROCESSED_TOKENS=' + processed_tokens.length);
-  let info = getInfoAboutProcessedTokens(processed_tokens);
+
+  let f_index = 0;
+  let format_str = '';
+  let transposable_tokens = [];
+
+  let info = getInfoAboutProcessedTokens(processed_tokens); // HERE NOW
+  for (let i = 0; i < info.transposable_tokens.length; ++i)
+  {
+    let curr_token = info.transposable_tokens[i];
+    if (curr_token.type == 'chord')
+    {
+      let fstr = '{' + f_index + '}';
+      
+    }
+    else if (curr_token.type == 'comment')
+    {
+      processComment(curr_token.string, f_index, format_str, transposable_tokens)
+    }
+  }
+
+
   console.log('  * INFO: ' + info.descr());
   console.log('RETURNING TEXTLINE: TOKENS=' + info.transposable_tokens.length + ', FORMAT_STR=' + info.format_str);
   return new TextLine(info.transposable_tokens, info.format_str, info.needs_transposing);
@@ -389,7 +568,7 @@ function getInfoAboutProcessedTokens(processed_tokens)
   let word_count = 0;
   let comment_count = 0;
   let transposable_comment_count = 0;
-  let transposable_tokens = [];
+  let transposable_tokens = []; // Chords only
 
   for (let i = 0; i < processed_tokens.length; ++i)
   {
