@@ -8,7 +8,7 @@ class HtmlText
     this.color = color;   // #RRGGBB
   }
 
-  html()
+  string()
   {
     let space = '&nbsp;';
     let tab = '&emsp;'
@@ -45,29 +45,18 @@ class HtmlText
   }
 }
 
-function toHtml(text, size, color)
+function toHtml(textline, size, color)
 {
-  let textline = getTextLine(text);
   if (!textline.needs_transposing)
   {
     console.log('toHtml():: NEEDS_TRANSPOSING=' + textline.needs_transposing);
-    return new HtmlText(text, size, 'normal', '#000000');
+
+    let html_text = new HtmlText(textline.format_str, size, 'normal', '#000000');
+    return html_text.string();
   }
   
   console.log('toHtml():: NEEDS_TRANSPOSING=Yes');
-  let tokenizer = new Tokenizer(text);
-  let raw_tokens = [];
-  while(tokenizer.hasNext())
-  {
-    raw_tokens.push(tokenizer.getNext());
-  }
-
-  let pt_builder = new ProcessedTokenBuilder(raw_tokens);
-  let processed_tokens = [];
-  while (pt_builder.hasNext())
-  {
-    processed_tokens.push(pt_builder.getNext());
-  }
+  let processed_tokens = textline.processed_tokens;
 
   let html = '';
   for (let i = 0; i < processed_tokens.length; ++i)
@@ -76,12 +65,12 @@ function toHtml(text, size, color)
     if (curr_token.needs_transposing)
     {
       let h = new HtmlText(curr_token.string, size, 'bold', '#000000'); // Bold (colored)
-      html += h.html();
+      html += h.string();
     }
     else
     {
       let h = new HtmlText(curr_token.string, size, 'normal', '#000000'); // Plaintext (black)
-      html += h.html();
+      html += h.string();
     }
   }
   console.log('  HTML --> ' + html);
