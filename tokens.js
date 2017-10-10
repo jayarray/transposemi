@@ -370,7 +370,7 @@ function getProcessedTokenCounts(processed_tokens)
   return {'words': words, 'chords': chords, 'comments': comments};
 }
 
-function processComment2(comment, format_str, transposable_tokens)
+function processComment(comment, format_str, transposable_tokens)
 {
   let tokenizer = new Tokenizer(comment.inner_string);
   let raw_tokens = tokenizer.getAll();
@@ -401,7 +401,7 @@ function processComment2(comment, format_str, transposable_tokens)
           let curr_p_token = comment.processed_tokens[k];
           if (curr_p_token.needs_transposing)
           {
-            format_str = processComment2(comment, format_str, transposable_tokens); // HERE NOW 777
+            format_str = processComment(comment, format_str, transposable_tokens); // HERE NOW 777
           }
           else
           {
@@ -617,7 +617,7 @@ function getTextLine(str)
       
       if (comment.needs_transposing)
       {
-        format_str += processComment2(comment, format_str, transposable_tokens); // CONT HERE!!!!
+        format_str += processComment(comment, format_str, transposable_tokens); // CONT HERE!!!!
       }
       else
       {
