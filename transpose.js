@@ -151,14 +151,14 @@ class TextLineTransposer
           raw_tokens.push(tokenizer.getNext());
         }
 
-        let comment_info = getCommentInfo(raw_tokens, 0); // HERE
-        let new_str = this.transposeComment(new Comment2(comment_info.open_bracket, 
+        let comment_info = getCommentInfo(raw_tokens, 0);
+        let new_str = this.transposeComment(new Comment(comment_info.open_bracket, 
                                                         comment_info.closed_bracket, 
                                                         comment_info.inner_string));
         transposed_strings.push(new_str);
       }
     }
-    return getFormattedString(textline.format_str, transposed_strings);
+    return getFormattedString2(textline.format_str, transposed_strings);
   }
 
   transposeComment(comment)
@@ -179,7 +179,7 @@ class TextLineTransposer
         }
       }
     }
-    return getFormattedString(comment.format_str, transposed_strings);
+    return getFormattedString2(comment.format_str, transposed_strings);
   }
 
   getLookupDictionary(end_chord)
