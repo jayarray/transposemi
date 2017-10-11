@@ -1,11 +1,9 @@
 class HtmlText
 {
-  constructor(text, size, weight, color)
+  constructor(text, class_name)
   {
     this.text = text;
-    this.size = size;     // pt (int)
-    this.weight = weight; // normal | lighter | bold | bolder
-    this.color = color;   // #RRGGBB
+    this.class_name = class_name;
   }
 
   string()
@@ -14,10 +12,7 @@ class HtmlText
     let tab = '&emsp;'
     let newline = '<br>';
 
-    let ret = '<div style="font-size:' + this.size + 'pt;' +
-              ' font-weight:' + this.weight + ';' +
-              ' color:' + this.color +
-              ';">';
+    let ret = '<div class="' + this.class_name + '">';
 
     for (let i = 0; i < this.text.length; ++i)
     {
@@ -45,14 +40,15 @@ class HtmlText
   }
 }
 
-function toHtml(textline, size, color) // NOTE: textline trans_tokens should be transposed by this point.
+function toHtml(textline) // NOTE: textline trans_tokens should be transposed by this point.
 {
   if (!textline.needs_transposing)
   {
     console.log('toHtml():: NEEDS_TRANSPOSING=' + textline.needs_transposing);
 
-    let html_text = new HtmlText(textline.format_str, size, 'normal', '#000000');
-    return html_text.html();
+    let class_name = 'plaintext';
+    let html_text = new HtmlText(textline.format_str, class_name);
+    return html_text.string();
   }
   
   console.log('toHtml():: NEEDS_TRANSPOSING=Yes');
@@ -71,7 +67,7 @@ function toHtml(textline, size, color) // NOTE: textline trans_tokens should be 
     if (set_index < start_end_index_sets.length)
     {
       let curr_set = start_end_index_sets[set_index]; // HERE NOW! FIXX !!!
-      set_index += 1; // REMOVE IF FAILS!
+      set_index += 1;
 
       let h = null;
       if (curr_set.start_index == 0 || curr_set.start_index == curr_index || curr_set.end_index == textline.format_str.length - 1)
@@ -79,7 +75,7 @@ function toHtml(textline, size, color) // NOTE: textline trans_tokens should be 
         // Append token string to HTML
         let p_token = processed_tokens[pt_index];
         pt_index += 1;
-        h = new HtmlText(p_token.string, size, 'bold', color); // Bold (colored)
+        h = new HtmlText(p_token.string, 'chord'); // Bold (colored)
         html += h.string();
       }
       else
@@ -88,7 +84,7 @@ function toHtml(textline, size, color) // NOTE: textline trans_tokens should be 
         {
           // Append plaintext to HTML
           let f_substr = textline.format_str.substring(curr_index, textline.format_str.length - 1);
-          h = new HtmlText(f_substr, size, 'normal', '#000000'); // Normal (black)
+          h = new HtmlText(f_substr, 'plaintext'); // Normal (black)
           html += h.string();
           break;
         }
@@ -96,13 +92,13 @@ function toHtml(textline, size, color) // NOTE: textline trans_tokens should be 
         {
           // Append plaintext to HTML
           let f_substr = textline.format_str.substring(curr_index, curr_set.start_index);
-          h = new HtmlText(f_substr, size, 'normal', '#000000'); // Normal (black)
+          h = new HtmlText(f_substr, 'plaintext'); // Normal (black)
           html += h.string();
 
           // Append token string to HTML
           let p_token = processed_tokens[pt_index];
           pt_index += 1;
-          h = new HtmlText(p_token.string, size, 'bold', color); // Bold (colored)
+          h = new HtmlText(p_token.string, 'chord'); // Bold (colored)
           html += h.string();
         }
       }
