@@ -46,9 +46,24 @@ function toHtml(textline) // NOTE: textline trans_tokens should be transposed by
   {
     console.log('toHtml():: NEEDS_TRANSPOSING=' + textline.needs_transposing);
 
-    let html_text = new HtmlText(textline.format_str, 'plaintext');
+    let html_text = null;
+    if (textline.processed_tokens.length > 0)
+    {
+      // Get formatted string
+      let pt_strings = [];
+      textline.processed_tokens.forEach(token => pt_strings.push(token.string));
+      let plaintext_str = getFormattedString(textline.format_str, pt_strings);
+
+      // set HtmlText
+      html_text = new HtmlText(plaintext_str, 'plaintext');
+    }
+    else
+    {
+      html_text = new HtmlText(textline.format_str, 'plaintext');
+    }
     return html_text.string();
   }
+  
   
   console.log('toHtml():: NEEDS_TRANSPOSING=Yes');
   let processed_tokens = textline.processed_tokens;
