@@ -70,7 +70,9 @@ function toHtml(textline) // NOTE: textline trans_tokens should be transposed by
       set_index += 1;
 
       let h = null;
-      if (curr_set.start_index == 0 || curr_set.start_index == curr_index || curr_set.end_index == textline.format_str.length - 1)
+      if (curr_set.start_index == 0 || 
+          curr_set.start_index == curr_index || 
+          (curr_set.end_index == textline.format_str.length - 1 && curr_set.start_index == curr_index) ) // REMOVE right side of && if FAILS!
       {
         // Append token string to HTML
         let p_token = processed_tokens[pt_index];
