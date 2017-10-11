@@ -138,13 +138,28 @@ function transpose()
   for (let i = 0; i < text_lines.length; ++i)
   {
     let curr_textline = text_lines[i];
-    let html_str = toHtml(curr_textline);
-    formatted_lines.push(html_str);
+    if (curr_textline.format_str != '')
+    {
+      let html_str = toHtml(curr_textline);
+      formatted_lines.push(html_str);
+    }
   }
 
   console.log('\n\nBUILDING RESULTS...');
-  let formatted_html = getFormattedString2(newline_format_str, formatted_lines);
 
+  let formatted_html = '';
+  if (newline_format_str.includes('\n'))
+  {
+    let reformatted_newline_str = replaceWhiteSpaceWithHtmlEntities(newline_format_str);
+    console.log('\nREFORMATTED_NEWLINE_STR= ' + reformatted_newline_str);
+
+    formatted_html = getFormattedString(reformatted_newline_str, formatted_lines);
+  }
+  else
+  {
+    formatted_html = getFormattedString(newline_format_str, formatted_lines);
+  }
+  console.log('\n\nFINAL_HTML= ' + formatted_html);
   transposed_text_div.innerHTML = formatted_html; 
 }
 
