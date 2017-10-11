@@ -77,32 +77,6 @@ function endOptionChanged()
   }
 }
 
-// FONT COLOR
-var font_color_dropdown = document.getElementById("font_color_dropdown");
-font_color_dropdown.addEventListener('change', transpose);
-
-function getSelectedColor()
-{
-  return font_color_dropdown.options[font_color_dropdown.selectedIndex].value;
-}
-
-
-// FONT SIZE
-let sizes = [];
-for (let i = 8; i <= 78; i += 2)
-{
-  sizes.push(i);
-}
-
-var font_size_dropdown = document.getElementById("font_size_dropdown");
-font_size_dropdown.addEventListener('change', transpose);
-setDropdownOptions(font_size_dropdown, sizes);
-
-function getSelectedSize()
-{
-  return font_size_dropdown.options[font_size_dropdown.selectedIndex].value;
-}
-
 //-----------------------------------
 // TRANSPOSE
 
@@ -164,7 +138,7 @@ function transpose()
   for (let i = 0; i < text_lines.length; ++i)
   {
     let curr_textline = text_lines[i];
-    let html_str = toHtml(curr_textline, getSelectedSize(), getSelectedColor());
+    let html_str = toHtml(curr_textline);
     formatted_lines.push(html_str);
   }
 
