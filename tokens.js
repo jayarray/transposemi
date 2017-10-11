@@ -600,15 +600,15 @@ function getTextLine(str)
   let transposable_tokens = [];
   let info = getInfoAboutProcessedTokens(processed_tokens);
 
-  for (let i = 0; i < info.transposable_tokens.length; ++i)
+  for (let i = 0; i < processed_tokens.length; ++i)
   {
-    let curr_token = info.transposable_tokens[i];
+    let curr_token = processed_tokens[i];
     if (curr_token.type == 'chord')
     {
       format_str += '{?}';
       transposable_tokens.push(curr_token);
     }
-    else if (curr_token.type == 'comment') // HERE NOW
+    else if (curr_token.type == 'comment')
     {
       let open_bracket = curr_token.string.charAt(0);
       let closed_bracket = curr_token.string.charAt(curr_token.string.length - 1);
@@ -617,7 +617,7 @@ function getTextLine(str)
       
       if (comment.needs_transposing)
       {
-        format_str += processComment(comment, format_str, transposable_tokens); // CONT HERE!!!!
+        format_str += processComment(comment, format_str, transposable_tokens);
       }
       else
       {
