@@ -22,15 +22,21 @@ html, body {
   font-weight: bold;
 }
 
+#original_textarea {
+  font-size: 12pt;
+  font-family: Arial;
+}
 
 .plaintext {
-  font-size: 14pt;
+  font-size: 12pt;
   font-weight: normal;
   color: #000000;
+  font-family: Arial;
 }
 
 .chord {
-  font-size: 14pt;
+  font-size: 12pt;
   font-weight: bold;
+  font-family: Arial;
   color: #ff0000;
 }
