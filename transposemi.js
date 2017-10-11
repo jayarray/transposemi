@@ -143,36 +143,33 @@ function transpose()
   let textline_transposer = new TextLineTransposer(start_chord, end_chord);
   console.log('\nTRANSPOSING textlines...'); // DEBUG
 
-  return; // DEBUG
   
-  // Transpose and convert to HTML
-  let chrod_transposer = new ChordTransposer(start_chord, end_chord);
-  let transposed_textlines = [];
+  // Transpose chords for each textline
+  let chord_transposer = new ChordTransposer(start_chord, end_chord);
   for (let i = 0; i < text_lines.length; ++i)
   {
-    // Transpose transposable tokens
     let curr_textline_tokens = text_lines[i].processed_tokens;
     for (let j = 0; j < curr_textline_tokens.length; ++j)
     {
       let curr_token = curr_textline_tokens[j];
-      
-      //let chord = ; //ChordTransposer.transpose()
+      let curr_chord = getChord(curr_token.string);
+      let transposed_chord = chord_transposer.transpose(curr_chord);
+      curr_token.string = transposed_chord.string();
     }
   }
 
 
-
   // Convert lines to formatted HTML
   let formatted_lines = [];
-  for (let i = 0; i < transposed_textlines.length; ++i)
+  for (let i = 0; i < text_lines.length; ++i)
   {
-    let curr_textline = transposed_textlines[i];
+    let curr_textline = text_lines[i];
     let html_str = toHtml(curr_textline, getSelectedSize(), getSelectedColor());
     formatted_lines.push(html_str);
   }
 
   console.log('\n\nBUILDING RESULTS...');
-  let formatted_html = getFormattedString(newline_format_str, formatted_lines);
+  let formatted_html = getFormattedString2(newline_format_str, formatted_lines);
 
   transposed_text_div.innerHTML = formatted_html; 
 }
@@ -181,7 +178,6 @@ function transpose()
 function getNewlineFormatString(text)
 {
   let format_str = '';
-  let f_index = 0;
 
   let i = 0;
   while (i < text.length)
@@ -199,9 +195,7 @@ function getNewlineFormatString(text)
         i += 1;
         curr_char = text.charAt(i);
       }
-
-      format_str += '{' + f_index + '}';
-      f_index += 1;
+      format_str += '{?}';
     }
   }
   return format_str;
