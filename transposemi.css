@@ -5,19 +5,32 @@ html, body {
 
 .v_lo {
   display: flex;
-  flex_direction: column;
+  flex-direction: column;
 }
 
 .h_lo {
   display: flex;
-  flex_direction: row;
+  flex-direction: row;
 }
 
-#main > div {
-  flex: 1;
+#transposed_text_div > div {
+  display: inline;
 }
 
 #title {
   font-size: 28pt;
   font-weight: bold;
+}
+
+
+.plaintext {
+  font-size: 14pt;
+  font-weight: normal;
+  color: #000000;
+}
+
+.chord {
+  font-size: 14pt;
+  font-weight: bold;
+  color: #ff0000;
 }
