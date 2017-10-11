@@ -46,8 +46,7 @@ function toHtml(textline) // NOTE: textline trans_tokens should be transposed by
   {
     console.log('toHtml():: NEEDS_TRANSPOSING=' + textline.needs_transposing);
 
-    let class_name = 'plaintext';
-    let html_text = new HtmlText(textline.format_str, class_name);
+    let html_text = new HtmlText(textline.format_str, 'plaintext');
     return html_text.string();
   }
   
@@ -110,6 +109,27 @@ function toHtml(textline) // NOTE: textline trans_tokens should be transposed by
 
   console.log('  HTML --> ' + html);
   return html;
+}
+
+function replaceWhiteSpaceWithHtmlEntities(str)
+{
+  console.log('  BEFORE_WHITESPACE_REPLACE=' + str);
+  let ret = '';
+
+  for (let i = 0; i < str.length; ++i)
+  {
+    let curr_char = str.charAt(i);
+    if (curr_char == ' ' || curr_char == '\t' || curr_char == '\n')
+    {
+      let h = new HtmlText(curr_char , 'plaintext');
+      ret += h.string();
+    }
+    else
+    {
+      ret += curr_char;
+    }
+  }
+  return ret;
 }
 
 function getStartAndEndIndexSets(format_str)
