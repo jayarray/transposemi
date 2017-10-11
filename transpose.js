@@ -158,7 +158,7 @@ class TextLineTransposer
         transposed_strings.push(new_str);
       }
     }
-    return getFormattedString2(textline.format_str, transposed_strings);
+    return getFormattedString(textline.format_str, transposed_strings);
   }
 
   transposeComment(comment)
@@ -179,7 +179,7 @@ class TextLineTransposer
         }
       }
     }
-    return getFormattedString2(comment.format_str, transposed_strings);
+    return getFormattedString(comment.format_str, transposed_strings);
   }
 
   getLookupDictionary(end_chord)
