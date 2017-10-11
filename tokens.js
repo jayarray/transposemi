@@ -573,7 +573,7 @@ class TextLine
   string()
   {
     let str_args = processed_tokens.map(token => token.string);
-    return getFormattedString(this.format_str, str_args);
+    return getFormattedString2(this.format_str, str_args);
   }
 }
 
