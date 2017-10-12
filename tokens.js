@@ -266,6 +266,7 @@ class Comment
   {
     let ret = 'NEEDS_TRANSPOSING=' + this.needs_transposing;
     ret += ', FORMAT_STR=' + this.format_str;
+    ret += ', NON_COMMENTS_NEED_TRAN=' + this.non_comments_need_transposing;
     this.processed_tokens.forEach(token => ret += '\n  TOKEN: ' + token.descr());
     return ret;
   }
@@ -401,6 +402,7 @@ function getProcessedTokenCounts(processed_tokens)
 
 function processComment(comment, format_str, transposable_tokens)
 { 
+  console.log('CURR_COMMENT=' + comment.descr());
   format_str += comment.open_bracket;
   
   let tokenizer = new Tokenizer(comment.inner_string);
