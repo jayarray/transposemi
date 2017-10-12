@@ -651,7 +651,6 @@ function getTextLine(str)
       let closed_bracket = curr_token.string.charAt(curr_token.string.length - 1);
       let inner_string  = curr_token.string.substring(1, curr_token.string.length - 1);
       let comment = new Comment(open_bracket, closed_bracket, inner_string);
-      console.log('CURR_COMMENT: ' + comment.descr());
       
       if (comment.needs_transposing)
       {
