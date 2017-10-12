@@ -76,50 +76,54 @@ function toHtml(textline) // NOTE: textline trans_tokens should be transposed by
 
   let html = '';
 
-  while(curr_index < textline.format_str.length)
+  while(curr_index < textline.format_str.length && set_index < start_end_index_sets.length)
   {
-    if (set_index < start_end_index_sets.length)
-    {
-      let curr_set = start_end_index_sets[set_index]; // HERE NOW! FIXX !!!
-      set_index += 1;
+    let curr_set = start_end_index_sets[set_index]; // HERE NOW! FIXX !!!
+    set_index += 1;
 
-      let h = null;
-      if (curr_set.start_index == 0 || 
-          curr_set.start_index == curr_index || 
-          (curr_set.end_index == textline.format_str.length - 1 && curr_set.start_index == curr_index) ) // REMOVE right side of && if FAILS!
+    let h = null;
+    if (curr_set.start_index == 0 || 
+        curr_set.start_index == curr_index || 
+        (curr_set.end_index == textline.format_str.length - 1 && curr_set.start_index == curr_index) ) // REMOVE right side of && if FAILS!
+    {
+      // Append token string to HTML
+      let p_token = processed_tokens[pt_index];
+      pt_index += 1;
+      h = new HtmlText(p_token.string, 'chord'); // Bold (colored)
+      html += h.string();
+    }
+    else
+    {
+      if (pt_index >= processed_tokens.length)
       {
+        // Append plaintext to HTML
+        let f_substr = textline.format_str.substring(curr_index, textline.format_str.length - 1);
+        h = new HtmlText(f_substr, 'plaintext'); // Normal (black)
+        html += h.string();
+        break;
+      }
+      else
+      {
+        // Append plaintext to HTML
+        let f_substr = textline.format_str.substring(curr_index, curr_set.start_index);
+        h = new HtmlText(f_substr, 'plaintext'); // Normal (black)
+        html += h.string();
+
         // Append token string to HTML
         let p_token = processed_tokens[pt_index];
         pt_index += 1;
         h = new HtmlText(p_token.string, 'chord'); // Bold (colored)
         html += h.string();
       }
-      else
-      {
-        if (pt_index >= processed_tokens.length)
-        {
-          // Append plaintext to HTML
-          let f_substr = textline.format_str.substring(curr_index, textline.format_str.length - 1);
-          h = new HtmlText(f_substr, 'plaintext'); // Normal (black)
-          html += h.string();
-          break;
-        }
-        else
-        {
-          // Append plaintext to HTML
-          let f_substr = textline.format_str.substring(curr_index, curr_set.start_index);
-          h = new HtmlText(f_substr, 'plaintext'); // Normal (black)
-          html += h.string();
-
-          // Append token string to HTML
-          let p_token = processed_tokens[pt_index];
-          pt_index += 1;
-          h = new HtmlText(p_token.string, 'chord'); // Bold (colored)
-          html += h.string();
-        }
-      }
-      curr_index = curr_set.end_index + 1;
     }
+    curr_index = curr_set.end_index + 1;
+  }
+
+  // Append any remaining plaintext
+  if (curr_index < textline.format_str.length)
+  {
+    h = new HtmlText(textline.format_str.substr(curr_index), 'plaintext'); // Normal (black)
+    html += h.string();
   }
 
   console.log('  HTML --> ' + html);
