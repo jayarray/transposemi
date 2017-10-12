@@ -598,9 +598,13 @@ function getTextLine(str)
   let info = getInfoAboutProcessedTokens(processed_tokens);
   if (!info.needs_transposing)
   {
-    let pt_strings = info.transposable_tokens.map(token => token.string);
-    format_str = getFormattedString(info.format_str, pt_strings);
-    return new TextLine(transposable_tokens, format_str, info.needs_transposing);  // REMOVE IF BLOCK if fails!!!
+    if (info.transposable_tokens.length > 0)
+    {
+      let pt_strings = info.transposable_tokens.map(token => token.string);
+      format_str = getFormattedString(info.format_str, pt_strings);
+      return new TextLine(transposable_tokens, format_str, info.needs_transposing);
+    }
+    return new TextLine(transposable_tokens, info.format_str, info.needs_transposing);
   }
 
   for (let i = 0; i < processed_tokens.length; ++i)
