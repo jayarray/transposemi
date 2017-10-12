@@ -416,7 +416,7 @@ function processComment(comment, format_str, transposable_tokens)
     {
       if (curr_token.type == 'chord')
       {
-        if (comment.non_comments_need_transposing) // FIX
+        if (comment.non_comments_need_transposing)
         {
           transposable_tokens.push(curr_token);
           format_str += '{?}';
