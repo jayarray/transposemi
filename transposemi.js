@@ -4,6 +4,7 @@ var transposed_text_div = document.getElementById("transposed_text_div");
 //----------------------------------------
 // TEXTAREAS
 var original_textarea = document.getElementById("original_textarea");
+original_textarea.addEventListener('input', transpose);
 
 //---------------------------------------
 // DROPDOWNS
