@@ -40,12 +40,10 @@ class HtmlText
   }
 }
 
-function toHtml(textline) // NOTE: textline trans_tokens should be transposed by this point.
+function toHtml(textline)
 {
   if (!textline.needs_transposing)
   {
-    console.log('toHtml():: NEEDS_TRANSPOSING=' + textline.needs_transposing);
-
     let html_text = null;
     if (textline.processed_tokens.length > 0)
     {
@@ -64,27 +62,22 @@ function toHtml(textline) // NOTE: textline trans_tokens should be transposed by
     return html_text.string();
   }
   
-  
-  console.log('toHtml():: NEEDS_TRANSPOSING=Yes');
   let processed_tokens = textline.processed_tokens;
-
   let curr_index = 0;
   let pt_index = 0;
-
   let start_end_index_sets = getStartAndEndIndexSets(textline.format_str);
   let set_index = 0;
-
   let html = '';
 
   while(curr_index < textline.format_str.length && set_index < start_end_index_sets.length)
   {
-    let curr_set = start_end_index_sets[set_index]; // HERE NOW! FIXX !!!
+    let curr_set = start_end_index_sets[set_index];
     set_index += 1;
 
     let h = null;
     if (curr_set.start_index == 0 || 
         curr_set.start_index == curr_index || 
-        (curr_set.end_index == textline.format_str.length - 1 && curr_set.start_index == curr_index) ) // REMOVE right side of && if FAILS!
+        (curr_set.end_index == textline.format_str.length - 1 && curr_set.start_index == curr_index) )
     {
       // Append token string to HTML
       let p_token = processed_tokens[pt_index];
@@ -125,14 +118,11 @@ function toHtml(textline) // NOTE: textline trans_tokens should be transposed by
     h = new HtmlText(textline.format_str.substr(curr_index), 'plaintext'); // Normal (black)
     html += h.string();
   }
-
-  console.log('  HTML --> ' + html);
   return html;
 }
 
 function replaceWhiteSpaceWithHtmlEntities(str)
 {
-  console.log('  BEFORE_WHITESPACE_REPLACE=' + str);
   let ret = '';
 
   for (let i = 0; i < str.length; ++i)
@@ -161,18 +151,15 @@ function getStartAndEndIndexSets(format_str)
   let adjustment = format_str.length - substr.length;
   let curr_index = 0;
 
-  console.log('  *** FORMAT_STR=' + format_str);
   while (start_index >= 0)
   {
     let set = {'start_index': start_index + adjustment, 'end_index': start_index + (placeholder.length - 1) + adjustment};
-    console.log('INDEX_SET=' + JSON.stringify(set));
     sets.push(set);
 
     if (set.end_index < format_str.length - 1)
     {
       substr = format_str.substring(set.end_index + 1);
       adjustment = format_str.length - substr.length;
-      console.log('  ** NEW_SUBSTR=' + substr);
       start_index = substr.indexOf(placeholder);
     }
     else
