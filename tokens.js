@@ -82,6 +82,41 @@ class Comment
     this.needs_transposing = this.needsTransposing(inner_string);                       // Indicates there is something that needs transposing
     this.non_comments_need_transposing = this.nonCommentsNeedTransposing(inner_string); // Indicates all current-level non-comment tokens can be plaintext.
     this.processed_tokens = this.getProcessedTokens(inner_string);
+
+    if (!this.non_comments_need_transposing)
+    {
+      let adjustments = this.getAdjustedFormatStringAndProcessedTokens(this.open_bracket, this.closed_bracket, this.inner_string);
+      this.format_str = adjustments.format_str;
+      this.processed_tokens = adjustments.processed_tokens;
+    }
+  }
+
+  getAdjustedFormatStringAndProcessedTokens(open_bracket, closed_bracket, inner_string)
+  {
+    let new_format_str = '';
+    let new_processed_tokens = [];
+
+    let tokenizer = new Tokenizer(inner_string);
+    let raw_tokens = tokenizer.getAll();
+
+    let pt_builder = new ProcessedTokenBuilder(raw_tokens);
+    let p_tokens = pt_builder.getAll();
+
+    for (let i = 0; i < p_tokens.length; ++i)
+    {
+      let curr_token = p_tokens[i];
+      if (curr_token.type == 'comment')
+      {
+        new_format_str += '{?}';
+        new_processed_tokens.push(curr_token);
+      }
+      else
+      {
+        new_format_str += curr_token.string;
+      }
+    }
+
+    return {'format_str': new_format_str, 'processed_tokens': new_processed_tokens};
   }
 
   needsTransposing(inner_string)
@@ -365,17 +400,15 @@ function getProcessedTokenCounts(processed_tokens)
 }
 
 function processComment(comment, format_str, transposable_tokens)
-{
-  let tokenizer = new Tokenizer(comment.inner_string);
-  let raw_tokens = tokenizer.getAll();
-
-  let pt_builder = new ProcessedTokenBuilder(raw_tokens);
-  let processed_tokens = pt_builder.getAll();
- 
-  format_str += comment.open_bracket;
-  for (let i = 0; i < processed_tokens.length; ++i)
+{ 
+  if (comment.non_comments_need_transposing)
   {
-    let curr_token = processed_tokens[i];
+
+  }
+  //format_str += comment.open_bracket;
+  for (let i = 0; i < comment.processed_tokens.length; ++i)
+  {
+    let curr_token = comment.processed_tokens[i];
     if (curr_token.needs_transposing)
     {
       if (curr_token.type == 'chord')
