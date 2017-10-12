@@ -113,22 +113,24 @@ function transpose()
 
   console.log('\n\n*** TRANSPOSING:: FROM=' + start_chord.string() + ', TO=' + end_chord.string());
 
+  return; // DEBUG
 
-  let textline_transposer = new TextLineTransposer(start_chord, end_chord);
-  console.log('\nTRANSPOSING textlines...'); // DEBUG
 
-  
   // Transpose chords for each textline
   let chord_transposer = new ChordTransposer(start_chord, end_chord);
   for (let i = 0; i < text_lines.length; ++i)
   {
-    let curr_textline_tokens = text_lines[i].processed_tokens;
-    for (let j = 0; j < curr_textline_tokens.length; ++j)
+    let curr_textline = text_lines[i];
+    if (curr_textline.needs_transposing)
     {
-      let curr_token = curr_textline_tokens[j];
-      let curr_chord = getChord(curr_token.string);
-      let transposed_chord = chord_transposer.transpose(curr_chord);
-      curr_token.string = transposed_chord.string();
+      let curr_textline_tokens = text_lines[i].processed_tokens;
+      for (let j = 0; j < curr_textline_tokens.length; ++j)
+      {
+        let curr_token = curr_textline_tokens[j];
+        let curr_chord = getChord(curr_token.string);
+        let transposed_chord = chord_transposer.transpose(curr_chord);
+        curr_token.string = transposed_chord.string();
+      }
     }
   }
 
