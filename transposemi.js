@@ -3,14 +3,11 @@ var transposed_text_div = document.getElementById("transposed_text_div");
 
 //----------------------------------------
 // TEXTAREAS
-
 var original_textarea = document.getElementById("original_textarea");
-//var transposed_textarea = document.getElementById("transposed_textarea");
 
 //---------------------------------------
 // DROPDOWNS
 
-// *** CHORDS
 var start_dropdown = document.getElementById("start_dropdown");
 start_dropdown.addEventListener('change', changeEndDropdownOptions)
 
@@ -82,39 +79,24 @@ function endOptionChanged()
 
 function transpose()
 {
-  let original_text = original_textarea.value; 
+  let original_text = original_textarea.value;
+  if (original_text.trim() == '')
+  {
+    return; // No transposition required.
+  }
+
+  let newline_format_str = getNewlineFormatString(original_text);
 
   let lines = original_text.split('\n');
-  console.log('\nTOTAL_LINES = ' + lines.length);
-  lines.forEach(line => console.log('LINE=' + line));
-
   let text_lines = lines.map(line => getTextLine(line));
-  console.log('\nTEXT_LINE_COUNT = ' + text_lines.length);
-
-  text_lines.forEach((line, i) => {
-    console.log('\n  TEXTLINE (' + i + '):: ' + line.descr());
-    line.processed_tokens.forEach(ptoken => {
-      console.log('    TOKEN: ' + ptoken.string);
-    });
-  });
-
 
   let start_chord = getChord(getSelectedStartOption());
   let end_chord = getChord(getSelectedEndOption());
+
   if (start_chord.string() == end_chord.string())
   {
-    console.log('CHORDS are the same. No transposition needed.');
-    return;
+    return;  // No transposition required.
   }
-
-  // Keep original format handy
-  let newline_format_str = getNewlineFormatString(original_text);
-  console.log('\n\n*** NEWLINE_FORMAT_STR:\n' + newline_format_str);
-
-  console.log('\n\n*** TRANSPOSING:: FROM=' + start_chord.string() + ', TO=' + end_chord.string());
-
-  return; // DEBUG
-
 
   // Transpose chords for each textline
   let chord_transposer = new ChordTransposer(start_chord, end_chord);
@@ -134,7 +116,6 @@ function transpose()
     }
   }
 
-
   // Convert lines to formatted HTML
   let formatted_lines = [];
   for (let i = 0; i < text_lines.length; ++i)
@@ -147,21 +128,16 @@ function transpose()
     }
   }
 
-  console.log('\n\nBUILDING RESULTS...');
-
   let formatted_html = '';
   if (newline_format_str.includes('\n'))
   {
     let reformatted_newline_str = replaceWhiteSpaceWithHtmlEntities(newline_format_str);
-    console.log('\nREFORMATTED_NEWLINE_STR= ' + reformatted_newline_str);
-
     formatted_html = getFormattedString(reformatted_newline_str, formatted_lines);
   }
   else
   {
     formatted_html = getFormattedString(newline_format_str, formatted_lines);
   }
-  console.log('\n\nFINAL_HTML= ' + formatted_html);
   transposed_text_div.innerHTML = formatted_html; 
 }
 
@@ -191,6 +167,3 @@ function getNewlineFormatString(text)
   }
   return format_str;
 }
-
-
-
