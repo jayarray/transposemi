@@ -265,8 +265,8 @@ class Comment
   descr()
   {
     let ret = 'NEEDS_TRANSPOSING=' + this.needs_transposing;
-    ret += 'FORMAT_STR=' + this.format_str;
-    this.processed_tokens.forEach(token => ret += '  TOKEN: ' + token.descr());
+    ret += ', FORMAT_STR=' + this.format_str;
+    this.processed_tokens.forEach(token => ret += '\n  TOKEN: ' + token.descr());
     return ret;
   }
 }
@@ -401,20 +401,30 @@ function getProcessedTokenCounts(processed_tokens)
 
 function processComment(comment, format_str, transposable_tokens)
 { 
-  if (comment.non_comments_need_transposing)
-  {
+  format_str += comment.open_bracket;
+  
+  let tokenizer = new Tokenizer(comment.inner_string);
+  let raw_tokens = tokenizer.getAll();
 
-  }
-  //format_str += comment.open_bracket;
-  for (let i = 0; i < comment.processed_tokens.length; ++i)
+  let pt_builder = new ProcessedTokenBuilder(raw_tokens);
+  let processed_tokens = pt_builder.getAll();
+
+  for (let i = 0; i < processed_tokens.length; ++i)
   {
-    let curr_token = comment.processed_tokens[i];
+    let curr_token = processed_tokens[i];
     if (curr_token.needs_transposing)
     {
       if (curr_token.type == 'chord')
       {
-        transposable_tokens.push(curr_token);
-        format_str += '{?}';
+        if (comment.non_comments_need_transposing) // FIX
+        {
+          transposable_tokens.push(curr_token);
+          format_str += '{?}';
+        }
+        else
+        {
+          format_str += curr_token.string;
+        }
       }
       else if (curr_token.type == 'comment')
       {
@@ -632,7 +642,7 @@ function getTextLine(str)
     let curr_token = processed_tokens[i];
     if (curr_token.type == 'chord')
     {
-      format_str += '{?}';
+      format_str += '';
       transposable_tokens.push(curr_token);
     }
     else if (curr_token.type == 'comment')
@@ -641,6 +651,7 @@ function getTextLine(str)
       let closed_bracket = curr_token.string.charAt(curr_token.string.length - 1);
       let inner_string  = curr_token.string.substring(1, curr_token.string.length - 1);
       let comment = new Comment(open_bracket, closed_bracket, inner_string);
+      console.log('CURR_COMMENT: ' + comment.descr());
       
       if (comment.needs_transposing)
       {
