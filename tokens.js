@@ -396,17 +396,13 @@ function processComment(comment, format_str, transposable_tokens)
         let inner_string = curr_token.string.substring(1, curr_token.string.length - 1);
         let comment = new Comment(open_bracket, closed_bracket, inner_string);
 
-        for (let k = 0; k < comment.processed_tokens.length; ++k)
+        if (comment.needs_transposing) // HERE NOW!!!
         {
-          let curr_p_token = comment.processed_tokens[k];
-          if (curr_p_token.needs_transposing)
-          {
-            format_str = processComment(comment, format_str, transposable_tokens); // HERE NOW 777
-          }
-          else
-          {
-            format_str += curr_p_token.string;
-          }
+          format_str = processComment(comment, format_str, transposable_tokens);
+        }
+        else
+        {
+          format_str += curr_p_token.string;
         }
       }
     }
@@ -415,7 +411,7 @@ function processComment(comment, format_str, transposable_tokens)
       format_str += curr_token.string;
     }
   }
-  return format_str + comment.closed_bracket; // REMOVE return keyword if FAILS
+  return format_str + comment.closed_bracket;
 }
 
 //----------------------------------------------
@@ -624,7 +620,7 @@ function getTextLine(str)
       
       if (comment.needs_transposing)
       {
-        format_str += processComment(comment, format_str, transposable_tokens);
+        format_str = processComment(comment, format_str, transposable_tokens);
       }
       else
       {
