@@ -642,7 +642,7 @@ function getTextLine(str)
     let curr_token = processed_tokens[i];
     if (curr_token.type == 'chord')
     {
-      format_str += '';
+      format_str += '{?}';
       transposable_tokens.push(curr_token);
     }
     else if (curr_token.type == 'comment')
