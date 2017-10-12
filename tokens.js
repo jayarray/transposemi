@@ -598,7 +598,14 @@ function getTextLine(str)
 
   let format_str = '';
   let transposable_tokens = [];
+
   let info = getInfoAboutProcessedTokens(processed_tokens);
+  if (!info.needs_transposing)
+  {
+    let pt_strings = info.transposable_tokens.map(token => token.string);
+    format_str = getFormattedString(info.format_str, pt_strings);
+    return new TextLine(transposable_tokens, format_str, info.needs_transposing);  // REMOVE IF BLOCK if fails!!!
+  }
 
   for (let i = 0; i < processed_tokens.length; ++i)
   {
@@ -634,9 +641,8 @@ function getTextLine(str)
   //console.log('RETURNING TEXTLINE: TOKENS=' + info.transposable_tokens.length + ', FORMAT_STR=' + info.format_str);
   //return new TextLine(info.transposable_tokens, info.format_str, info.needs_transposing);
 
-  return new TextLine(transposable_tokens, format_str, info.needs_transposing); // REMOVE IF FAILS!
   console.log('RETURNING TEXTLINE: TOKENS=' + transposable_tokens.length + ', FORMAT_STR=' + format_str);
-  
+  return new TextLine(transposable_tokens, format_str, info.needs_transposing); 
 }
 
 class ProcessedTokensInfo
