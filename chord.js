@@ -40,7 +40,7 @@ function isValidNumber(str)
       return false;
     }
   }
-  return str.charAt(0) != '0'; // Proper numbers don't start with 0.
+  return str.charAt(0) != '0';
 }
 
 function isNullOrEmpty(str, start_index)
@@ -371,12 +371,12 @@ function getChord(str)
                       }
                       return chord; // CHORD m MOD NUMBER
                     }
-                    return null; // ADDED 8/16/2015 Was allowing 'Csusxxx' as a chord.
+                    return null;
                   }
                 }
                 return chord; // CHORD m MOD
               }
-              return null; // ADDED 10-6-2017.  Remove if FAILS!
+              return null;
             }
           }
           return chord; // CHORD m
@@ -414,7 +414,7 @@ function getChord(str)
                 }
                 return chord; // CHORD MOD NUMBER
               }
-              return null; // str is INVALID  (Example:  AsusApple, Bmajp, etc) // ADDED
+              return null; // str is INVALID  (Example:  AsusApple, Bmajp, etc)
             }
           }
           return chord; // CHORD MOD
