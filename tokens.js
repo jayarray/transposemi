@@ -642,6 +642,8 @@ function getTextLine(str)
     let curr_token = processed_tokens[i];
     if (curr_token.type == 'chord')
     {
+      let _chord = getChord(curr_token.string);
+      console.log('  CHORD=' + _chord.string() + ', IS_MINOR=' + _chord.is_minor); // DEBUG
       format_str += '{?}';
       transposable_tokens.push(curr_token);
     }
