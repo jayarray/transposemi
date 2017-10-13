@@ -402,7 +402,6 @@ function getProcessedTokenCounts(processed_tokens)
 
 function processComment(comment, format_str, transposable_tokens)
 { 
-  console.log('CURR_COMMENT=' + comment.descr());
   format_str += comment.open_bracket;
   
   let tokenizer = new Tokenizer(comment.inner_string);
