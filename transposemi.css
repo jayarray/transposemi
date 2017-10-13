@@ -13,18 +13,51 @@ html, body {
   flex-direction: row;
 }
 
+#top_lo {
+  padding-bottom: 20px;
+}
+
 #transposed_text_div > div {
   display: inline;
 }
 
 #title {
-  font-size: 28pt;
+  font-size: 40pt;
   font-weight: bold;
+}
+
+#dropdown_div {
+  padding-bottom: 20px;
+}
+
+.header {
+  font-size: 18pt;
+  padding-bottom: 20px;
+  padding-left: 10px;
 }
 
 #original_textarea {
   font-size: 12pt;
   font-family: Arial;
+  padding: 10px;
+}
+
+#results_spacer {
+  padding: 10px;
+}
+
+#transposed_text_div {
+  max-width: 470px;
+  padding: 10px;
+  word-wrap: break-word;
+}
+
+.dropdown_spacer {
+    padding-left: 10px;
+}
+
+#arrow {
+  font-size: 20pt;
 }
 
 .plaintext {
