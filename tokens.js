@@ -623,6 +623,9 @@ function getTextLine(str)
     processed_tokens.push(pt_builder.getNext());
   }
 
+  let token_counts = getProcessedTokenCounts(processed_tokens);
+  let non_comments_need_transposing = token_counts.chords > 0 && token_counts.words == 0;
+
   // Gather transposable tokens & build format string
   let format_str = '';
   let transposable_tokens = [];
@@ -644,8 +647,15 @@ function getTextLine(str)
     let curr_token = processed_tokens[i];
     if (curr_token.type == 'chord')
     {
-      format_str += '{?}';
-      transposable_tokens.push(curr_token);
+      if (non_comments_need_transposing)
+      {
+        format_str += '{?}';
+        transposable_tokens.push(curr_token);
+      }
+      else
+      {
+        format_str += curr_token.string; // ADDED. REMOVE IF FAILS!
+      }
     }
     else if (curr_token.type == 'comment')
     {
