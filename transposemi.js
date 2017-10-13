@@ -80,24 +80,22 @@ function endOptionChanged()
 
 function transpose()
 {
-  let original_text = original_textarea.value;
-  if (original_text.trim() == '')
-  {
-    return; // No transposition required.
-  }
-
-  let newline_format_str = getNewlineFormatString(original_text);
-
-  let lines = original_text.split('\n');
-  let text_lines = lines.map(line => getTextLine(line));
-
   let start_chord = getChord(getSelectedStartOption());
   let end_chord = getChord(getSelectedEndOption());
 
-  if (start_chord.string() == end_chord.string())
+  let original_text = original_textarea.value;
+  let newline_format_str = getNewlineFormatString(original_text);
+
+  if (original_text.trim() == '' || start_chord.string() == end_chord.string())
   {
-    return;  // No transposition required.
+    let h = new HtmlText(original_text, 'plaintext');
+    transposed_text_div.innerHTML = h.string();
+    return; // No transposition required.
   }
+
+
+  let lines = original_text.split('\n');
+  let text_lines = lines.map(line => getTextLine(line));
 
   // Transpose chords for each textline
   let chord_transposer = new ChordTransposer(start_chord, end_chord);
