@@ -52,9 +52,14 @@ html, body {
 }
 
 #transposed_text_div {
-  max-width: 475px;
   padding: 10px;
+  background-color: #FFFFFF;
+  max-width: 475px;
   word-wrap: break-word;
+}
+
+#transposed_text_div_area {
+  padding: 10px;
 }
 
 .dropdown_spacer {
