@@ -774,12 +774,12 @@ function isWordChar(c)
 
 function isOpenBracket(c)
 {
-  return c == '(' || c == '[' || c == '{' || c == '<';
+  return c == '(' || c == '[' || c == '{';
 }
 
 function isClosedBracket(c)
 {
-  return c == ')' || c == ']' || c == '}' || c == '>';
+  return c == ')' || c == ']' || c == '}';
 }
 
 function isBracket(c)
@@ -791,8 +791,7 @@ function isClosedPair(open_bracket, closed_bracket)
 {
   return (open_bracket == '(' && closed_bracket == ')')
          || (open_bracket == '[' && closed_bracket == ']')
-         || (open_bracket == '{' && closed_bracket == '}')
-         || (open_bracket == '<' && closed_bracket == '>');
+         || (open_bracket == '{' && closed_bracket == '}');
 }
 
 function getCorrespondingClosedBracket(open_bracket)
@@ -808,10 +807,6 @@ function getCorrespondingClosedBracket(open_bracket)
   else if (open_bracket == '{')
   {
     return '}';
-  }
-  else if (open_bracket == '<')
-  {
-    return '>';
   }
   else
   {
