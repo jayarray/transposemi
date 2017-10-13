@@ -654,7 +654,7 @@ function getTextLine(str)
       }
       else
       {
-        format_str += curr_token.string; // ADDED. REMOVE IF FAILS!
+        format_str += curr_token.string;
       }
     }
     else if (curr_token.type == 'comment')
