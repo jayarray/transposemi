@@ -3,6 +3,10 @@ html, body {
   height: 100%;
 }
 
+#main {
+  padding: 10px;
+}
+
 .v_lo {
   display: flex;
   flex-direction: column;
@@ -47,7 +51,7 @@ html, body {
 }
 
 #transposed_text_div {
-  max-width: 470px;
+  max-width: 475px;
   padding: 10px;
   word-wrap: break-word;
 }
@@ -72,4 +76,14 @@ html, body {
   font-weight: bold;
   font-family: Arial;
   color: #ff0000;
+}
+
+#left {
+  padding: 10px;
+  background-color: #b3b3b3;
+}
+
+#right {
+  padding: 10px;
+  background-color: #e6ffee;
 }
