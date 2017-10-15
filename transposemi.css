@@ -48,6 +48,7 @@ html, body {
   font-size: 12pt;
   font-family: sans-serif;
   padding: 10px;
+  word-wrap: break-word;
 }
 
 #results_spacer {
